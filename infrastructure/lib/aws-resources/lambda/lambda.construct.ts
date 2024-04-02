@@ -6,7 +6,7 @@ import { Construct } from 'constructs';
 import { DynamodbPermission } from '@common/types/dynamodb.type';
 import { appConfig } from '@config/index';
 import { getDynamodbTables } from '../dynamodb/dynamodb.utils';
-import { getParameter, putParameter } from '../ssm/ssm.util';
+import { getParameter, putParameter } from '../ssm/ssm.utils';
 import { LambdaFunction } from './lambda.helpers';
 
 export class LambdaConstruct extends Construct {
