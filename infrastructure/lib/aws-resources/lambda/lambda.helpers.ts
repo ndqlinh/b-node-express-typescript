@@ -33,9 +33,6 @@ export class LambdaFunction implements LambdaFunctionProps {
   runtime?: Runtime;
   timeout?: number;
   memorySize?: FunctionMemorySize;
-  environment?: {
-    [key: string]: string;
-  };
   ssm?: string;
   dynamodbTables?: { [tableName: string]: DynamodbPermission[] };
   customPolicies?: PolicyStatement[];
@@ -52,7 +49,6 @@ export class LambdaFunction implements LambdaFunctionProps {
     this.runtime = data.runtime || Runtime.NODEJS_20_X;
     this.timeout = data.timeout || 30;
     this.memorySize = data.memorySize || 128;
-    this.environment = data.environment;
     this.ssm = data.ssm ? `NodeExpress${data.ssm}` : undefined;
     this.dynamodbTables = this.changeDynamodbTablesKey(data.dynamodbTables);
     this.customPolicies = data.customPolicies;
