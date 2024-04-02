@@ -1,4 +1,4 @@
-import { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload, verify } from 'jsonwebtoken';
 import { jwtDecode } from 'jwt-decode';
 
 import { HTTPStatus } from '../enums/http.enum';
@@ -24,4 +24,14 @@ export const decodeToken = (authorizationToken: string): JwtPayload => {
   // }
 
   return decodedToken;
+};
+
+export const authorizer = async (authorizationToken: string) => {
+  verify(authorizationToken, process.env.SECRET_KEY, (err, decoded) => {
+    if (err) {
+      throw new HttpException(HTTPStatus.UNAUTHORIZED, 'Invalid token');
+    }
+
+    return decoded;
+  });
 };
