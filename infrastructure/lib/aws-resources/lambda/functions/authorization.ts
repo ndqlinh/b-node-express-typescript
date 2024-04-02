@@ -1,4 +1,4 @@
-import { LambdaFunction } from '../lambda.helpers';
+import { LambdaFunction } from '../lambda.helper';
 
 export const authorizationFunction = new LambdaFunction({
   functionName: 'ApiAuthorizer',

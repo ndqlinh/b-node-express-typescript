@@ -1,4 +1,4 @@
-import { LambdaFunction } from "../lambda.helpers";
+import { LambdaFunction } from "../lambda.helper";
 import { ROUTES } from "@config/routes";
 import { TODOS_TABLE_NAME } from "@db/dynamodb/tables";
 import { DynamodbPermission } from "@common/types/dynamodb.type";

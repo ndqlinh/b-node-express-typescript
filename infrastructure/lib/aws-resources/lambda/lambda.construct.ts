@@ -7,7 +7,7 @@ import { DynamodbPermission } from '@common/types/dynamodb.type';
 import { appConfig } from '@config/index';
 import { getDynamodbTables } from '../dynamodb/dynamodb.utils';
 import { getParameter, putParameter } from '../ssm/ssm.utils';
-import { LambdaFunction } from './lambda.helpers';
+import { LambdaFunction } from './lambda.helper';
 
 export class LambdaConstruct extends Construct {
   constructor(scope: Construct, id: string) {

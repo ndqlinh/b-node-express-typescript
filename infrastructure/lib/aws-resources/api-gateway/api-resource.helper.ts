@@ -1,5 +1,5 @@
 import { HttpMethods } from '@common/types/common.type';
-import { LambdaFunction } from '../lambda/lambda.helpers';
+import { LambdaFunction } from '../lambda/lambda.helper';
 
 export interface ApigatewayResourceProps {
   path: string;

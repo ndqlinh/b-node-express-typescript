@@ -25,7 +25,7 @@ import { Construct } from 'constructs';
 
 import { authorizationFunction } from '../lambda/functions/authorization';
 import { getDynamodbTables } from '../dynamodb/dynamodb.utils';
-import { LambdaFunction } from '../lambda/lambda.helpers';
+import { LambdaFunction } from '../lambda/lambda.helper';
 import { getParameter, putParameter } from '../ssm/ssm.utils';
 import { ApigatewayResource } from './api-resource.helper';
 import { getMethodOptionsNoAuth, getMethodOptionsWithAuth } from './api-gateway.utils';
