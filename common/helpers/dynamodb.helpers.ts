@@ -1,4 +1,3 @@
-import { appConfig } from '@config/index';
 import {
   BillingMode,
   GlobalSecondaryIndex,
