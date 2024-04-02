@@ -1,3 +1,3 @@
 export const ROUTES = {
-  todo: '/api/todo'
+  todos: '/api/todos'
 }
