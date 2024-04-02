@@ -15,7 +15,7 @@
       "@common/*": ["./common/*"],
       "@config/*": ["./config/*"],
       "@db/*": ["./db/*"],
-      "@shared/*": ["./shared/*"],
+      "@shared/*": ["./src/shared/*"],
     },
     "lib": ["ES2021.String", "dom", "dom.iterable"]
   },
