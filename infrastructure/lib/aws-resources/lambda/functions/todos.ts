@@ -1,7 +1,7 @@
-import { LambdaFunction } from "../lambda.helper";
-import { ROUTES } from "@config/routes";
-import { TODOS_TABLE_NAME } from "@db/dynamodb/tables";
-import { DynamodbPermission } from "@common/types/dynamodb.type";
+import { LambdaFunction } from '../lambda.helper';
+import { ROUTES } from '@config/routes';
+import { TODOS_TABLE_NAME } from '@db/dynamodb/tables';
+import { DynamodbPermission } from '@common/types/dynamodb.type';
 
 const lambdaOpions = {
   entry: 'todos.controller.ts',

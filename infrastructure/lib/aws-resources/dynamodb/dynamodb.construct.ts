@@ -4,7 +4,7 @@ import { capitalizeFirstLetter } from '@common/utils/txt.util';
 import { Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
 
-export class DynamoContruct extends Construct {
+export class DynamodbConstruct extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
   }

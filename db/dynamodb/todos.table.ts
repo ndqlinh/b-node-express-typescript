@@ -1,5 +1,5 @@
 import { BaseTableDefinition } from '@common/helpers/dynamodb.helpers';
-import { AttributeType, ProjectionType } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType } from 'aws-cdk-lib/aws-dynamodb';
 import { TODOS_TABLE_NAME } from './tables';
 
 export const todosTableDefinition = new BaseTableDefinition({
