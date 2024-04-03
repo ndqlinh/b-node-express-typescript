@@ -5,7 +5,7 @@ import { DynamodbPermission } from '@common/types/dynamodb.type';
 
 const lambdaOpions = {
   entry: 'todos.controller.ts',
-  auth: false,
+  auth: true,
   dynamodbTables: {
     [TODOS_TABLE_NAME]: [DynamodbPermission.FULL, DynamodbPermission.INDEX]
   }
