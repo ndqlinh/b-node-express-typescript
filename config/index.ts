@@ -11,7 +11,7 @@ const configByEnv = {
   dev: {
     profile: {
       accounttId: '910693666650',
-      region: 'ap-southeast-1'
+      region: 'ap-southeast-2'
     }
   }
 };
