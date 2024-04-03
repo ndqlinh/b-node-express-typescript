@@ -9,7 +9,7 @@ const lambdaOptions = {
   dynamodbTables: {
     [ACCOUNTS_TABLE_NAME]: [DynamodbPermission.FULL, DynamodbPermission.INDEX]
   }
-}
+};
 
 const accountRegistrationFunction = new LambdaFunction({
   ...lambdaOptions,
@@ -32,4 +32,4 @@ const accountSigninFunction = new LambdaFunction({
 export const accountFunctions = [
   accountRegistrationFunction,
   accountSigninFunction
-]
+];
