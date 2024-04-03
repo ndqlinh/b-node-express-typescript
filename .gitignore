@@ -8,3 +8,7 @@ dist
 
 # Environment variables
 .env
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
