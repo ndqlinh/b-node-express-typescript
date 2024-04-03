@@ -1,5 +1,5 @@
 export const ROUTES = {
-  register: '/api/account/register',
-  signin: '/api/account/signin',
+  register: '/api/register',
+  signin: '/api/signin',
   todos: '/api/todos'
 }
