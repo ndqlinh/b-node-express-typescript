@@ -20,12 +20,12 @@ class DevelopmentStack extends cdk.Stack {
     // Create API Gateway
     const apigatewayConstruct = new ApigatewayConstruct(
       this,
-      `NodeExpressApigatewayConstruct`
+      'NodeExpressApigatewayConstruct'
     );
     apigatewayConstruct.createApiGateway(this);
 
     // Create Lambda Functions
-    const lambdaConstruct = new LambdaConstruct(this, `NodeExpressLambdaConstruct`);
+    const lambdaConstruct = new LambdaConstruct(this, 'NodeExpressLambdaConstruct');
     const funcs = lambdaConstruct.createLambdaFunctions(this, [...lambdaFunctions]);
 
     // Create API Resources
