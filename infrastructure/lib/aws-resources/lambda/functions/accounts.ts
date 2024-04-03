@@ -22,9 +22,9 @@ const accountRegistrationFunction = new LambdaFunction({
 
 const accountSigninFunction = new LambdaFunction({
   ...lambdaOptions,
-  functionName: 'AccountRegistration',
-  handler: 'registerAccount',
-  ssm: 'AccountRegistration',
+  functionName: 'AccountSignin',
+  handler: 'signinAccount',
+  ssm: 'AccountSignin',
   apiResourceMethod: 'POST',
   apiResourcePath: ROUTES.signin
 });

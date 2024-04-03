@@ -8,7 +8,9 @@
     "dev": "nodemon app.ts",
     "build": "tsc",
     "watch": "tsc -w",
-    "clean": "tsc --build --clean"
+    "clean": "tsc --build --clean",
+    "synth": "cdk synth --app 'npx ts-node --prefer-ts-exts infrastructure/bin/development.ts' --no-staging > template.yaml",
+    "cdk:deploy": "cdk deploy --all --require-approval=never"
   },
   "keywords": [],
   "author": "",
