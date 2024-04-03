@@ -10,19 +10,7 @@ const configByEnv = {
   },
   dev: {
     profile: {
-      accounttId: '',
-      region: 'ap-southeast-1'
-    }
-  },
-  stg: {
-    profile: {
-      accounttId: '',
-      region: 'ap-southeast-1'
-    }
-  },
-  prd: {
-    profile: {
-      accounttId: '',
+      accounttId: '910693666650',
       region: 'ap-southeast-1'
     }
   }
