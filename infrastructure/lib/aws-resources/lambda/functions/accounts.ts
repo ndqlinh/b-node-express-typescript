@@ -3,33 +3,17 @@ import { ROUTES } from '@config/routes';
 import { ACCOUNTS_TABLE_NAME } from '@db/dynamodb/tables';
 import { DynamodbPermission } from '@common/types/dynamodb.type';
 
-const lambdaOptions = {
+const authProxyFunction = new LambdaFunction({
+  functionName: 'AuthProxy',
   entry: 'accounts.controller.ts',
-  auth: false,
+  ssm: 'AuthProxy',
+  apiResourceMethod: 'ANY',
+  isApiProxy: true,
+  apiResourcePath: ROUTES.auth,
+  apiKeyRequired: false,
   dynamodbTables: {
     [ACCOUNTS_TABLE_NAME]: [DynamodbPermission.FULL, DynamodbPermission.INDEX]
   }
-};
-
-const accountRegistrationFunction = new LambdaFunction({
-  ...lambdaOptions,
-  functionName: 'AccountRegistration',
-  handler: 'registerAccount',
-  ssm: 'AccountRegistration',
-  apiResourceMethod: 'POST',
-  apiResourcePath: ROUTES.register
 });
 
-const accountSigninFunction = new LambdaFunction({
-  ...lambdaOptions,
-  functionName: 'AccountSignin',
-  handler: 'signinAccount',
-  ssm: 'AccountSignin',
-  apiResourceMethod: 'POST',
-  apiResourcePath: ROUTES.signin
-});
-
-export const accountFunctions = [
-  accountRegistrationFunction,
-  accountSigninFunction
-];
+export const authFunctions = [authProxyFunction];
