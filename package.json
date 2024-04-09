@@ -4,8 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/app.ts",
-    "dev": "nodemon app.ts",
     "build": "tsc",
     "watch": "tsc -w",
     "clean": "tsc --build --clean",
