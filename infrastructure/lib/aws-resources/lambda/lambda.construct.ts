@@ -19,8 +19,7 @@ export class LambdaConstruct extends Construct {
     const dynamodbTables = getDynamodbTables(scope);
     const defaultEnvironments: any = {
       ENVIRONMENT: process.env.ENVIRONMENT || 'dev',
-      REST_API_ID: getParameter(scope, appConfig.ssm.restApiId),
-      TOKEN_SECRET: getParameter(scope, appConfig.ssm.tokenSecret)
+      REST_API_ID: getParameter(scope, appConfig.ssm.restApiId)
     };
     // Create Lambda Function
     const result: { [key: string]: NodejsFunction } = {};
