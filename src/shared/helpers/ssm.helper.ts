@@ -18,7 +18,6 @@ export default class SsmHelper {
       };
       const cmd = new GetParameterCommand(params);
       const data = await this.ssm.send(cmd);
-      Logger.ERROR('SSM Params', data);
       return data;
     } catch (error) {
       Logger.INFO('Error getting SSM params', error);
