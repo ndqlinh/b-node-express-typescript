@@ -13,7 +13,7 @@ app.post(ROUTES.register, async (req: Request, res: Response, next) => {
   const userInfo = req.body;
   Logger.INFO('request body', userInfo);
   const ssm = new SsmHelper();
-  const param = ssm.getParams(process.env.SSM_TOKEN_SECRET);
+  const param = await ssm.getParams(process.env.SSM_TOKEN_SECRET);
   Logger.INFO('SSM Param', param);
   res.send({ code: 200, message: 'Register successful' });
 });
