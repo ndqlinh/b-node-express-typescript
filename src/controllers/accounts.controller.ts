@@ -16,7 +16,7 @@ app.post(ROUTES.register, async (req: Request, res: Response, next) => {
   Logger.INFO('request body', userInfo);
   const account = new AccountService();
   try {
-    const registeredAcount = account.register(userInfo);
+    const registeredAcount = await account.register(userInfo);
     res.send({ code: 200, data: registeredAcount });
   } catch (err) {
     throw new HttpException(
