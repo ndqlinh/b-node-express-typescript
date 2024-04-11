@@ -1,6 +1,6 @@
 import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
 import { Logger } from './logger.helper';
-export default class SsmService {
+export default class SsmHelper {
   ssm: SSMClient;
 
   constructor() {
