@@ -24,6 +24,7 @@ export interface AppConfig {
   ssm: {
     restApiId: string;
     rootResourceId: string;
+    tokenSecret: string;
   };
   dynamodb: {
     apiVersion: string;
@@ -46,8 +47,9 @@ export const getConfig = (env: string | undefined = process.env.ENVIRONMENT) => 
     },
     apiAuthorizer: true,
     ssm: {
-      restApiId: `NodeExpressRestApiId`,
-      rootResourceId: `NodeExpressRootResourceId`
+      restApiId: 'NodeExpressRestApiId',
+      rootResourceId: 'NodeExpressRootResourceId',
+      tokenSecret: 'NodeExpressTokenSecret'
     },
     dynamodb: {
       apiVersion: '2012-08-10',

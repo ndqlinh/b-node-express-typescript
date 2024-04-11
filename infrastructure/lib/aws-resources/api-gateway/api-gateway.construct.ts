@@ -141,7 +141,8 @@ export class ApigatewayConstruct extends Construct {
   loadParameters(scope: Construct) {
     this.ssmParams = {
       restApiId: getParameter(scope, appConfig.ssm.restApiId),
-      rootResourceId: getParameter(scope, appConfig.ssm.rootResourceId)
+      rootResourceId: getParameter(scope, appConfig.ssm.rootResourceId),
+      tokenSecret: getParameter(scope, appConfig.ssm.tokenSecret)
     };
   }
 
