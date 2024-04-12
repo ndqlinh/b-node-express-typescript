@@ -1,4 +1,7 @@
+import { Model } from "./model";
+
 export type Account = {
+  id?: string;
   email: string;
   password: string;
   accessToken?: string;
@@ -9,7 +12,7 @@ export type Account = {
   lastName?: string
 }
 
-export class AccountModel {
+export class AccountModel extends Model implements Account {
   email: string;
   password: string;
   gender?: string;
@@ -20,6 +23,8 @@ export class AccountModel {
   refreshToken: string;
 
   constructor(account: Account) {
+    super();
+
     this.email = account.email || '';
     this.password = account.password || '';
     this.gender = account.gender || '';
