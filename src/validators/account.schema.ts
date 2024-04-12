@@ -2,7 +2,6 @@ import Joi from 'joi';
 import { AccountModel } from '../models/account.model';
 
 export const AccountSchema: Joi.ObjectSchema<AccountModel> = Joi.object({
-  id: Joi.string(),
   email: Joi.string().required(),
   password: Joi.string().required(),
   gender: Joi.string(),

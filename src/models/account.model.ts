@@ -1,5 +1,4 @@
 export type Account = {
-  id?: string;
   email: string;
   password: string;
   accessToken?: string;
@@ -11,7 +10,6 @@ export type Account = {
 }
 
 export class AccountModel {
-  id?: string;
   email: string;
   password: string;
   gender?: string;
@@ -22,7 +20,6 @@ export class AccountModel {
   refreshToken: string;
 
   constructor(account: Account) {
-    this.id = account.id || '';
     this.email = account.email || '';
     this.password = account.password || '';
     this.gender = account.gender || '';
