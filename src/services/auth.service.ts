@@ -2,6 +2,9 @@ import { sign, verify } from 'jsonwebtoken';
 import SsmHelper from '@shared/helpers/ssm.helper';
 import { Account } from '../models/account.model';
 import { StatusCodes } from '@common/enums/status-codes.enum';
+import { Logger } from '@shared/helpers/logger.helper';
+import { HttpException } from '@shared/helpers/exception.helper';
+import { HTTPStatus } from '@shared/enums/http.enum';
 
 export default class AuthService {
   private readonly ssmHelper: SsmHelper;
@@ -21,16 +24,25 @@ export default class AuthService {
     const param = await this.ssmHelper.getParams('NodeExpressTokenSecret');
     const secretKey = param?.NodeExpressTokenSecret;
 
+    Logger.INFO('PARAM', secretKey);
+    Logger.INFO('TOKEN', token);
+
     if (!token) {
       return {
         code: StatusCodes.Unauthorized,
       }
     }
 
-    try {
-      return verify(token, secretKey);
-    } catch (error) {
-      throw new Error('Invalid access token');
-    }
+    console.log(123123);
+    verify(token, secretKey, (err, decoded) => {
+      if (err) {
+        return {
+          code: StatusCodes.Forbidden
+        }
+      }
+
+      Logger.INFO('Decoded', decoded);
+      return decoded;
+    });
   }
 }

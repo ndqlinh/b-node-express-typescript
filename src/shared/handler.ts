@@ -1,4 +1,5 @@
 import AuthService from '../services/auth.service';
+import { Logger } from './helpers/logger.helper';
 import { BaseResponse } from './helpers/response.helper';
 
 export const wrapper =
@@ -9,7 +10,7 @@ export const wrapper =
         event.body = typeof event.body == 'object' ? event.body : JSON.parse(event.body);
       }
 
-      const authHeader = event?.headers?.Authorization;
+      const authHeader = event?.authorizationToken;
       const token = authHeader && authHeader.split(' ')[1];
 
       const auth = new AuthService();
