@@ -29,13 +29,13 @@ export default class AuthService {
     Logger.INFO('TOKEN', token);
 
     if (!token) {
-      return BaseResponse.toError(new HttpException(HTTPStatus.UNAUTHORIZED, 'Unauthorized'))
+      return new HttpException(HTTPStatus.UNAUTHORIZED, 'Unauthorized');
     }
 
-    verify(token, secretKey, (error, decoded) => {
+    verify(token, secretKey, (error: any, decoded: any) => {
       if (error) {
         Logger.INFO('Verify token error', error)
-        return BaseResponse.toError(new HttpException(HTTPStatus.FORBIDDEN, error.message))
+        return new HttpException(HTTPStatus.FORBIDDEN, error.message);
       }
 
       Logger.INFO('Decoded', decoded);

@@ -1,4 +1,5 @@
 import AuthService from '../services/auth.service';
+import { Logger } from './helpers/logger.helper';
 import { BaseResponse } from './helpers/response.helper';
 
 export const wrapper =
@@ -14,6 +15,7 @@ export const wrapper =
 
       const auth = new AuthService();
       const user= await auth.verifyToken(token);
+      Logger.INFO('456456', user);
       event.user = user;
 
       const result = await handler({ ...event } as any, context, callback);
