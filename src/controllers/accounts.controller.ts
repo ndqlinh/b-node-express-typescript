@@ -18,9 +18,13 @@ app.post(ROUTES.register, async (req: Request, res: Response, next) => {
 
 app.post(ROUTES.signin, async (req: Request, res: Response, next) => {
   const account = new AccountService();
-  const verifiedAccount = await account.verify(req.body);
-  const result = await account.login(verifiedAccount);
-  return res.send(result);
+  const verifyResult = await account.verify(req.body);
+  if (verifyResult.email) {
+    const result = await account.login(verifyResult);
+    return res.send(result);
+  } else {
+    return res.send(verifyResult);
+  }
 });
 
 export const handler = serverless(app);

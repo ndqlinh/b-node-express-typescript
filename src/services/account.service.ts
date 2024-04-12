@@ -8,6 +8,7 @@ import { HttpException } from '@shared/helpers/exception.helper';
 import { HTTPStatus } from '@shared/enums/http.enum';
 import SsmHelper from '@shared/helpers/ssm.helper';
 import AuthService from './auth.service';
+import { Logger } from '@shared/helpers/logger.helper';
 
 export default class AccountService {
   private readonly accountRepository: AccountRepository;
@@ -49,9 +50,12 @@ export default class AccountService {
     const refreshToken = await this.auth.generateToken(account, '1h');
 
     return {
-      email: account.email,
-      accessToken,
-      refreshToken
+      code: HTTPStatus.OK,
+      data: {
+        email: account.email,
+        accessToken,
+        refreshToken
+      }
     };
   }
 
@@ -72,11 +76,8 @@ export default class AccountService {
     } else {
       const hashedPassword = await this.hashPassword(account.password);
       const isMatchedPassword = hashedPassword === tartgetAccount.password;
+      Logger.INFO('isMatchedPassword', isMatchedPassword);
       if (isMatchedPassword) {
-        return {
-          code: HTTPStatus.OK,
-          data: isMatchedPassword
-        }
         return tartgetAccount;
       } else {
         return {
