@@ -1,5 +1,6 @@
 import { Tables } from '@shared/enums/tables.enum';
 import DynamoDBConnector from '../shared/helpers/dynamodb.helper';
+import { Account } from '../models/account.model';
 
 export class AccountRepository {
   private readonly dbConnector: DynamoDBConnector;
@@ -13,13 +14,13 @@ export class AccountRepository {
     return result;
   }
 
-  async find(email) {
+  async findByEmail(email: string) {
     const params = {
       IndexName: 'emailIndex',
       KeyConditionExpression: 'email = :email',
       ExpressionAttributeValues: { ':email': email }
     };
-    const result = await this.dbConnector.query(Tables.ACCOUNTS, params);
-    return result?.[0];
+    const accounts: Account[] = await this.dbConnector.query(Tables.ACCOUNTS, params);
+    return accounts?.[0];
   }
 }

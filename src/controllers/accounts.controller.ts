@@ -5,6 +5,7 @@ import AccountService from '../services/account.service';
 import { Logger } from '@shared/helpers/logger.helper';
 import { HttpException } from '@shared/helpers/exception.helper';
 import { HTTPStatus } from '@shared/enums/http.enum';
+import AuthService from '../services/auth.service';
 
 const app = express();
 
@@ -27,9 +28,19 @@ app.post(ROUTES.register, async (req: Request, res: Response, next) => {
 });
 
 app.post(ROUTES.signin, async (req: Request, res: Response, next) => {
-  const account = req.body;
-  Logger.INFO('request body', account);
-  res.send({ code: 200, message: 'Signin successful' });
+  const account = new AccountService();
+  const verifiedAccount = await account.verify(req.body);
+  const auth = new AuthService();
+  const accessToken = auth.generateToken(verifiedAccount, '15m');
+  const refreshToken = auth.generateToken(verifiedAccount, '1h');
+
+  res.send({
+    code: 200, data: {
+      email: verifiedAccount.email,
+      accessToken,
+      refreshToken
+    }
+  });
 });
 
 export const handler = serverless(app);

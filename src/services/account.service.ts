@@ -41,4 +41,24 @@ export default class AccountService {
     const hashedPassword = crypto.createHash('md5').update(`${password}-${param?.NodeExpressTokenSecret}`).digest('hex');
     return hashedPassword.toString();
   }
+
+  async verify(account: any): Promise<Account> {
+    try {
+      const tartgetAccount: Account = await this.accountRepository.findByEmail(account.email);
+
+      if (!tartgetAccount) {
+        throw new HttpException(HTTPStatus.NOT_FOUND, 'Account does not exist');
+      } else {
+        const hashedPassword = await this.hashPassword(account.password);
+        const isMatchedPassword = hashedPassword === tartgetAccount.password;
+        if (isMatchedPassword) {
+          return tartgetAccount;
+        } else {
+          throw new HttpException(HTTPStatus.BAD_REQUEST, 'Invalid email or password');
+        }
+      }
+    } catch (error) {
+      throw new HttpException(HTTPStatus.INTERNAL_SERVER_ERROR, 'Verify account failed', error);
+    }
+  }
 }
