@@ -3,6 +3,9 @@ import SsmHelper from '@shared/helpers/ssm.helper';
 import { Account } from '../models/account.model';
 import { StatusCodes } from '@common/enums/status-codes.enum';
 import { Logger } from '@shared/helpers/logger.helper';
+import { BaseResponse } from '@shared/helpers/response.helper';
+import { HttpException } from '@shared/helpers/exception.helper';
+import { HTTPStatus } from '@shared/enums/http.enum';
 
 export default class AuthService {
   private readonly ssmHelper: SsmHelper;
@@ -26,17 +29,13 @@ export default class AuthService {
     Logger.INFO('TOKEN', token);
 
     if (!token) {
-      return {
-        code: StatusCodes.Unauthorized,
-      }
+      return BaseResponse.toError(new HttpException(HTTPStatus.UNAUTHORIZED, 'Unauthorized'))
     }
 
     verify(token, secretKey, (error, decoded) => {
       if (error) {
         Logger.INFO('Verify token error', error)
-        return {
-          code: StatusCodes.Forbidden
-        }
+        return BaseResponse.toError(new HttpException(HTTPStatus.FORBIDDEN, error.message))
       }
 
       Logger.INFO('Decoded', decoded);
