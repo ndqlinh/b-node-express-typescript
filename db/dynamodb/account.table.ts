@@ -12,7 +12,7 @@ export const accountsTableDefinition = new BaseTableDefinition({
   indexes: [
     {
       partitionKey: {
-        name: 'Email',
+        name: 'email',
         type: AttributeType.STRING
       },
       projectionType: ProjectionType.ALL
