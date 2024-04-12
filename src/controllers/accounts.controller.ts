@@ -2,7 +2,6 @@ import express, { Request, Response } from 'express';
 import serverless from 'serverless-http';
 import { ROUTES } from '@config/routes';
 import AccountService from '../services/account.service';
-import { StatusCodes } from '@common/enums/status-codes.enum';
 
 const app = express();
 
