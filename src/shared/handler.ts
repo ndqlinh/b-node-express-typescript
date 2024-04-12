@@ -1,5 +1,4 @@
 import AuthService from '../services/auth.service';
-import { Logger } from './helpers/logger.helper';
 import { BaseResponse } from './helpers/response.helper';
 
 export const wrapper =

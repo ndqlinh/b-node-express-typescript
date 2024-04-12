@@ -3,8 +3,6 @@ import SsmHelper from '@shared/helpers/ssm.helper';
 import { Account } from '../models/account.model';
 import { StatusCodes } from '@common/enums/status-codes.enum';
 import { Logger } from '@shared/helpers/logger.helper';
-import { HttpException } from '@shared/helpers/exception.helper';
-import { HTTPStatus } from '@shared/enums/http.enum';
 
 export default class AuthService {
   private readonly ssmHelper: SsmHelper;
