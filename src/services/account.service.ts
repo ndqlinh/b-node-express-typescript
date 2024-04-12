@@ -24,9 +24,7 @@ export default class AccountService {
     try {
       const accountModel = new AccountModel(accountInput);
       accountModel.password = await this.hashPassword(accountModel.password);
-      Logger.INFO('Account model', accountModel);
       const account = await this.accountRepository.save(accountModel);
-      Logger.INFO('Account saved', account);
       return account;
     } catch (error) {
       throw new HttpException(HTTPStatus.INTERNAL_SERVER_ERROR, 'Register account failed', error);

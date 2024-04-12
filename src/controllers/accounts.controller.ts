@@ -13,7 +13,6 @@ app.use(express.json());
 
 app.post(ROUTES.register, async (req: Request, res: Response, next) => {
   const userInfo = req.body;
-  Logger.INFO('request body', userInfo);
   const account = new AccountService();
   try {
     const registeredAcount = await account.register(userInfo);
