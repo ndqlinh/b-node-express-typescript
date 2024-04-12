@@ -9,6 +9,7 @@ import { HTTPStatus } from '@shared/enums/http.enum';
 import { Logger } from '@shared/helpers/logger.helper';
 import SsmHelper from '@shared/helpers/ssm.helper';
 import AuthService from './auth.service';
+import { BaseResponse } from '@shared/helpers/response.helper';
 
 export default class AccountService {
   private readonly accountRepository: AccountRepository;
@@ -52,18 +53,18 @@ export default class AccountService {
     return hashedPassword.toString();
   }
 
-  async verify(account: any): Promise<Account> {
+  async verify(account: any): Promise<Account | any> {
     const tartgetAccount: Account = await this.accountRepository.findByEmail(account.email);
 
     if (!tartgetAccount) {
-      throw new HttpException(HTTPStatus.NOT_FOUND, 'Account does not exist');
+      return BaseResponse.toError(new HttpException(HTTPStatus.NOT_FOUND, 'Account does not exist'));
     } else {
       const hashedPassword = await this.hashPassword(account.password);
       const isMatchedPassword = hashedPassword === tartgetAccount.password;
       if (isMatchedPassword) {
         return tartgetAccount;
       } else {
-        throw new HttpException(HTTPStatus.BAD_REQUEST, 'Invalid email or password');
+        return BaseResponse.toError(new HttpException(HTTPStatus.BAD_REQUEST, 'Invalid email or password'));
       }
     }
   }
