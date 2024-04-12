@@ -33,9 +33,9 @@ export default class AuthService {
       }
     }
 
-    console.log(123123);
-    verify(token, secretKey, (err, decoded) => {
-      if (err) {
+    verify(token, secretKey, (error, decoded) => {
+      if (error) {
+        Logger.INFO('Verify token error', error)
         return {
           code: StatusCodes.Forbidden
         }
