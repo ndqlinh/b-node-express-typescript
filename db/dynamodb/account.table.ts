@@ -1,5 +1,6 @@
-import { BaseTableDefinition } from '@common/helpers/dynamodb.helpers';
 import { AttributeType, ProjectionType } from 'aws-cdk-lib/aws-dynamodb';
+
+import { BaseTableDefinition } from '@common/helpers/dynamodb.helpers';
 import { ACCOUNTS_TABLE_NAME } from './tables';
 
 export const accountsTableDefinition = new BaseTableDefinition({
