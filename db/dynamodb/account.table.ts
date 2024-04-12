@@ -9,14 +9,5 @@ export const accountsTableDefinition = new BaseTableDefinition({
     name: 'id',
     type: AttributeType.STRING
   },
-  indexes: [
-    {
-      partitionKey: {
-        name: 'email',
-        type: AttributeType.STRING
-      },
-      projectionType: ProjectionType.ALL
-    }
-  ],
   pointInTimeRecovery: true
 });
