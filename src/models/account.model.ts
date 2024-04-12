@@ -4,8 +4,6 @@ export type Account = {
   id?: string;
   email: string;
   password: string;
-  accessToken?: string;
-  refreshToken?: string;
   gender?: string,
   dob?: string,
   firstName?: string,
@@ -19,8 +17,6 @@ export class AccountModel extends Model implements Account {
   dob?: string;
   firstName?: string;
   lastName?: string
-  accessToken: string;
-  refreshToken: string;
 
   constructor(account: Account) {
     super();
@@ -31,7 +27,5 @@ export class AccountModel extends Model implements Account {
     this.dob = account.dob || '';
     this.firstName = account.firstName || '';
     this.lastName = account.lastName || '';
-    this.accessToken = account.accessToken || '' || '';
-    this.refreshToken = account.refreshToken || '';
   }
 }
