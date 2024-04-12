@@ -11,7 +11,6 @@ export default class SsmHelper {
 
   async getParams(paramName: string): Promise<any> {
     try {
-      Logger.INFO('REGION', process.env.REGION);
       const params = {
         Name: paramName,
         WithDecryption: true

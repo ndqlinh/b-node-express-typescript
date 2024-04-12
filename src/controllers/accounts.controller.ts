@@ -14,16 +14,8 @@ app.use(express.json());
 app.post(ROUTES.register, async (req: Request, res: Response, next) => {
   const userInfo = req.body;
   const account = new AccountService();
-  try {
-    const registeredAcount = await account.register(userInfo);
-    return BaseResponse.toSuccess(registeredAcount);
-  } catch (error) {
-    throw new HttpException(
-      HTTPStatus.INTERNAL_SERVER_ERROR,
-      'Failed to register',
-      error
-    );
-  }
+  const registeredAcount = await account.register(userInfo);
+  return BaseResponse.toSuccess(registeredAcount);
 });
 
 app.post(ROUTES.signin, async (req: Request, res: Response, next) => {
