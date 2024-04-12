@@ -26,19 +26,11 @@ app.post(ROUTES.register, async (req: Request, res: Response, next) => {
 });
 
 app.post(ROUTES.signin, async (req: Request, res: Response, next) => {
-  try {
-    const account = new AccountService();
-    const verifiedAccount = await account.verify(req.body);
-    const result = await account.login(verifiedAccount);
+  const account = new AccountService();
+  const verifiedAccount = await account.verify(req.body);
+  const result = await account.login(verifiedAccount);
 
-    res.send({ code: 200, data: result });
-  } catch (error) {
-    throw new HttpException(
-      HTTPStatus.INTERNAL_SERVER_ERROR,
-      'Failed to login',
-      error
-    );
-  }
+  res.send({ code: 200, data: result });
 });
 
 export const handler = serverless(app);
