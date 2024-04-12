@@ -8,14 +8,17 @@ import { HttpException } from '@shared/helpers/exception.helper';
 import { HTTPStatus } from '@shared/enums/http.enum';
 import { Logger } from '@shared/helpers/logger.helper';
 import SsmHelper from '@shared/helpers/ssm.helper';
+import AuthService from './auth.service';
 
 export default class AccountService {
   private readonly accountRepository: AccountRepository;
   private readonly ssmHelper: SsmHelper;
+  private readonly auth: AuthService;
 
   constructor() {
     this.accountRepository = new AccountRepository();
     this.ssmHelper = new SsmHelper();
+    this.auth = new AuthService();
   }
 
   async register(accountInput: Account): Promise<Account> {
@@ -31,8 +34,15 @@ export default class AccountService {
     }
   }
 
-  login(account: any): Promise<Account> {
-    return;
+  async login(account: Account): Promise<any> {
+    const accessToken = await this.auth.generateToken(account, '15m');
+    const refreshToken = await this.auth.generateToken(account, '1h');
+
+    return {
+      email: account.email,
+      accessToken,
+      refreshToken
+    };
   }
 
   async hashPassword(password: string): Promise<string> {
