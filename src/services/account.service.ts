@@ -20,18 +20,24 @@ export default class AccountService {
     this.auth = new AuthService();
   }
 
-  async register(accountInput: Account): Promise<Account> {
+  async register(accountInput: Account): Promise<Account | any> {
     await validateSchema(AccountSchema, accountInput);
 
     try {
       const accountModel = new AccountModel(accountInput);
       const existedEmail = await this.accountRepository.findByEmail(accountModel.email);
       if (existedEmail) {
-        throw new HttpException(HTTPStatus.BAD_REQUEST, `Email ${accountModel.email} already exists`);
+        return {
+          code: HTTPStatus.BAD_REQUEST,
+          errorMsg: `Email ${accountModel.email} already exists`
+        }
       } else {
         accountModel.password = await this.hashPassword(accountModel.password);
         const account = await this.accountRepository.save(accountModel);
-        return account;
+        return {
+          code: HTTPStatus.OK,
+          data: account
+        }
       }
     } catch (error) {
       throw new HttpException(HTTPStatus.INTERNAL_SERVER_ERROR, 'Register account failed', error);
@@ -55,18 +61,28 @@ export default class AccountService {
     return hashedPassword.toString();
   }
 
-  async verify(account: any): Promise<Account> {
+  async verify(account: any): Promise<Account | any> {
     const tartgetAccount: Account = await this.accountRepository.findByEmail(account.email);
 
     if (!tartgetAccount) {
-      throw new HttpException(HTTPStatus.NOT_FOUND, 'Account does not exist');
+      return {
+        code: HTTPStatus.NOT_FOUND,
+        errorMsg: 'Account does not exist'
+      }
     } else {
       const hashedPassword = await this.hashPassword(account.password);
       const isMatchedPassword = hashedPassword === tartgetAccount.password;
       if (isMatchedPassword) {
+        return {
+          code: HTTPStatus.OK,
+          data: isMatchedPassword
+        }
         return tartgetAccount;
       } else {
-        throw new HttpException(HTTPStatus.BAD_REQUEST, 'Invalid email or password');
+        return {
+          code: HTTPStatus.BAD_REQUEST,
+          errorMsg: 'Invalid email or password'
+        }
       }
     }
   }

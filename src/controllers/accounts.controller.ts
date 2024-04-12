@@ -13,14 +13,14 @@ app.post(ROUTES.register, async (req: Request, res: Response, next) => {
   const userInfo = req.body;
   const account = new AccountService();
   const registeredAcount = await account.register(userInfo);
-  return res.send({ code: StatusCodes.Ok, data: registeredAcount });
+  return res.send(registeredAcount);
 });
 
 app.post(ROUTES.signin, async (req: Request, res: Response, next) => {
   const account = new AccountService();
   const verifiedAccount = await account.verify(req.body);
   const result = await account.login(verifiedAccount);
-  return res.send({ code: StatusCodes.Ok, data: result });
+  return res.send(result);
 });
 
 export const handler = serverless(app);
