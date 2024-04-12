@@ -1,5 +1,5 @@
+import AuthService from '../services/auth.service';
 import { BaseResponse } from './helpers/response.helper';
-import { authorizer } from './utils/jwt.util';
 
 export const wrapper =
   (handler: (event: any, context: any, callback: any) => Promise<any>): any =>
@@ -11,7 +11,9 @@ export const wrapper =
 
       const authHeader = event?.headers?.Authorization;
       const token = authHeader && authHeader.split(' ')[1];
-      const user= await authorizer(token);
+
+      const auth = new AuthService();
+      const user= await auth.verifyToken(token);
       event.user = user;
 
       const result = await handler({ ...event } as any, context, callback);
