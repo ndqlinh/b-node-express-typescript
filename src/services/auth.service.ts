@@ -34,8 +34,8 @@ export default class AuthService {
 
     verify(token, secretKey, (error: any, decoded: any) => {
       if (error) {
-        Logger.INFO('Verify token error', error)
-        return new HttpException(HTTPStatus.FORBIDDEN, error.message);
+        Logger.INFO('Verify token error', error.message);
+        throw new HttpException(HTTPStatus.FORBIDDEN, error.message);
       }
 
       Logger.INFO('Decoded', decoded);
