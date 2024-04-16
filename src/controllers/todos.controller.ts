@@ -1,6 +1,7 @@
 import { wrapper } from '@shared/handler';
 import { BaseResponse } from '@shared/helpers/response.helper';
 import TodoService from '../services/todo.service';
+import { Logger } from '@shared/helpers/logger.helper';
 
 export const createTodo = wrapper(async (event: any, _context: any, callback): Promise<any> => {
   const { ownerId } = event;
@@ -28,5 +29,9 @@ export const getTodos = wrapper(async (event: any, _context: any, callback): Pro
 });
 
 export const findTodo = wrapper(async (event: any, _context: any, callback): Promise<any> => {
-  return BaseResponse.toSuccess({ msg: 'Find Todo' });
+  const { id } = event.pathParameters;
+  Logger.INFO("Todo ID", id);
+  const todo = new TodoService();
+  const result = await todo.find(id);
+  return BaseResponse.toSuccess(result);
 });

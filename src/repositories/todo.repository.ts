@@ -23,6 +23,11 @@ export class TodoRepository {
     return todos || [];
   }
 
+  async find(id: string): Promise<Todo> {
+    const result: any = await this.dbConnector.get(Tables.TODOS, { id });
+    return result;
+  }
+
   async deleteById(id: string) {
     await this.dbConnector.delete(Tables.TODOS, { id });
     return true;

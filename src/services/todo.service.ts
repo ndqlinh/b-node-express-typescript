@@ -49,4 +49,18 @@ export default class TodoService {
       throw new HttpException(HTTPStatus.INTERNAL_SERVER_ERROR, 'Update todo failed', error);
     }
   }
+
+  async find(id: string): Promise<Todo> {
+    if (!id) {
+      throw new HttpException(HTTPStatus.BAD_REQUEST, 'Missing todo id');
+    }
+
+    try {
+      const todo = await this.todoRepository.find(id);
+      return todo;
+    } catch (error) {
+      Logger.INFO('Error while finding todo', error);
+      throw new HttpException(HTTPStatus.INTERNAL_SERVER_ERROR, 'Find todo failed', error);
+    }
+  }
  }
