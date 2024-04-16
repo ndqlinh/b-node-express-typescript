@@ -10,7 +10,11 @@ export const handler = wrapper(async (event: any, _context: any, callback): Prom
   try {
     const verifiedAccount: any = await auth.verifyToken(authorizationToken.split(' ')[1]);
     Logger.INFO('VERIFICATION', verifiedAccount);
-    callback(null, generatePolicy('Allow', methodArn, { ownerId: verifiedAccount.id, email: verifiedAccount.email }));
+    if (verifiedAccount.email) {
+      callback(null, generatePolicy('Allow', methodArn, { ownerId: verifiedAccount.id, email: verifiedAccount.email }));
+    } else {
+      callback('Invalid token', generatePolicy('Deny', methodArn));
+    }
   } catch (err) {
     Logger.INFO('AUTHORIZE ERROR', err);
     callback('Unauthorized', generatePolicy('Deny', methodArn));
