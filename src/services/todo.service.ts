@@ -19,10 +19,7 @@ export default class TodoService {
       const todoModel = new TodoModel(todoInput);
       const todo = await this.todoRepository.save(todoModel);
 
-      return {
-        code: HTTPStatus.OK,
-        data: todo
-      };
+      return todo;
     } catch (error) {
       throw new HttpException(HTTPStatus.INTERNAL_SERVER_ERROR, 'Create todo failed', error);
     }

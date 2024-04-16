@@ -1,12 +1,16 @@
+import { HTTPStatus } from './../shared/enums/http.enum';
 import { wrapper } from '@shared/handler';
 import { Logger } from '@shared/helpers/logger.helper';
 import { BaseResponse } from '@shared/helpers/response.helper';
+import TodoService from '../services/todo.service';
 
 export const createTodo = wrapper(async (event: any, _context: any, callback): Promise<any> => {
-  const todo = event.body;
-  Logger.INFO('TODO INPUT', todo);
-  Logger.INFO('EVENT', event);
-  return BaseResponse.toSuccess({ msg: 'Create Todo' });
+  const { ownerId } = event;
+  const requestBody = event.body;
+  const todo = new TodoService();
+  const result = await todo.create({ ...requestBody, ownerId });
+
+  return BaseResponse.toSuccess(result);
 });
 
 export const updateTodo = wrapper(async (event: any, _context: any, callback): Promise<any> => {
