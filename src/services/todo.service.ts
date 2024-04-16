@@ -13,7 +13,7 @@ export default class TodoService {
     this.todoRepository = new TodoRepository();
   }
 
-  async create(todoInput: Todo): Promise<any> {
+  async create(todoInput: Todo): Promise<Todo> {
     await validateSchema(TodoSchema, todoInput);
 
     try {
@@ -26,12 +26,27 @@ export default class TodoService {
     }
   }
 
-  async list(ownerId: string): Promise<any> {
+  async list(ownerId: string): Promise<Todo[]> {
     try {
       const todos = await this.todoRepository.findByOwnerId(ownerId);
       return todos;
     } catch (error) {
       throw new HttpException(HTTPStatus.INTERNAL_SERVER_ERROR, 'Get todo list failed', error);
+    }
+  }
+
+  async update(id: string, todoInput: Todo): Promise<Todo> {
+    if (!id) {
+      throw new HttpException(HTTPStatus.BAD_REQUEST, 'Missing todo id');
+    }
+
+    await validateSchema(TodoSchema, todoInput);
+    try {
+      const todoModel = new TodoModel(todoInput);
+      const todo = await this.todoRepository.save({...todoModel, id});
+      return todo;
+    } catch (error) {
+      throw new HttpException(HTTPStatus.INTERNAL_SERVER_ERROR, 'Update todo failed', error);
     }
   }
  }

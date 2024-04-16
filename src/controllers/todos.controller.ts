@@ -12,7 +12,12 @@ export const createTodo = wrapper(async (event: any, _context: any, callback): P
 });
 
 export const updateTodo = wrapper(async (event: any, _context: any, callback): Promise<any> => {
-  return BaseResponse.toSuccess({ msg: 'Update Todo' });
+  const { ownerId } = event;
+  const { id, newTodo } = event.body;
+  const todo = new TodoService();
+  const result = await todo.update(id, { ...newTodo, ownerId});
+
+  return BaseResponse.toSuccess(result);
 });
 
 export const getTodos = wrapper(async (event: any, _context: any, callback): Promise<any> => {
