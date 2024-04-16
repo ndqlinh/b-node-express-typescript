@@ -1,4 +1,6 @@
+import { appConfig } from '@config/index';
 import AuthService from '../services/auth.service';
+import { Logger } from './helpers/logger.helper';
 import { BaseResponse } from './helpers/response.helper';
 
 export const wrapper =
@@ -12,12 +14,16 @@ export const wrapper =
       const authHeader = event?.authorizationToken;
       const token = authHeader && authHeader.split(' ')[1];
 
-      const auth = new AuthService();
-      const verifyResult: any = await auth.verifyToken(token);
+      if (appConfig.env === 'local' && token) {
+        const auth = new AuthService();
+        const verifyResult: any = await auth.verifyToken(token);
+        Logger.INFO('verifyResult', verifyResult);
 
-      if (verifyResult.email) {
-        event.user = verifyResult;
+        if (verifyResult.email) {
+          event.user = verifyResult;
+        }
       }
+
       const result = await handler({ ...event } as any, context, callback);
       return result as any;
     } catch (error) {
