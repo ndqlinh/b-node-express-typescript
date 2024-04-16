@@ -4,6 +4,7 @@ import { TodoRepository } from '../repositories/todo.repository';
 import { TodoSchema } from '../validators/todo.schema';
 import { HttpException } from '@shared/helpers/exception.helper';
 import { HTTPStatus } from '@shared/enums/http.enum';
+import { Logger } from '@shared/helpers/logger.helper';
 
 export default class TodoService {
   private readonly todoRepository: TodoRepository;
@@ -28,13 +29,9 @@ export default class TodoService {
   async list(ownerId: string): Promise<any> {
     try {
       const todos = await this.todoRepository.findByOwnerId(ownerId);
-
-      return {
-        code: HTTPStatus.OK,
-        data: todos
-      };
+      return todos;
     } catch (error) {
-      throw new HttpException(HTTPStatus.INTERNAL_SERVER_ERROR, 'Create todo failed', error);
+      throw new HttpException(HTTPStatus.INTERNAL_SERVER_ERROR, 'Get todo list failed', error);
     }
   }
  }

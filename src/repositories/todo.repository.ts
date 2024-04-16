@@ -9,18 +9,18 @@ export class TodoRepository {
     this.dbConnector = new DynamoDBConnector();
   }
 
-  async save(input: Todo) {
+  async save(input: Todo): Promise<Todo> {
     const result = await this.dbConnector.put(Tables.TODOS, input);
     return result;
   }
 
-  async findByOwnerId(ownerId: string) {
+  async findByOwnerId(ownerId: string): Promise<Todo[]> {
     const params = {
-      KeyConditionExpression: 'ownerId = :ownerId',
+      FilterExpression: 'ownerId = :ownerId',
       ExpressionAttributeValues: { ':ownerId': ownerId }
     };
-    const todos: Todo[] = await this.dbConnector.query(Tables.TODOS, params);
-    return todos;
+    const todos: Todo[] = await this.dbConnector.scan(Tables.TODOS, params);
+    return todos || [];
   }
 
   async deleteById(id: string) {
