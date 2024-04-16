@@ -15,7 +15,7 @@ export const wrapper =
 
       const auth = new AuthService();
       const verifyResult: any = await auth.verifyToken(token);
-      Logger.INFO('verifyResult', verifyResult);
+
       if (verifyResult.email) {
         event.user = verifyResult;
       }
