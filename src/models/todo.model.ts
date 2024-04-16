@@ -4,7 +4,7 @@ export type Todo = {
   id?: string;
   ownerId: string;
   title: string;
-  description: string;
+  description?: string;
   dueDate?: string;
   priority?: 'low' | 'medium' | 'high';
 }
@@ -12,7 +12,7 @@ export type Todo = {
 export class TodoModel extends Model implements Todo {
   ownerId: string;
   title: string;
-  description: string;
+  description?: string;
   dueDate?: string;
   priority?: 'low' | 'medium' | 'high';
 

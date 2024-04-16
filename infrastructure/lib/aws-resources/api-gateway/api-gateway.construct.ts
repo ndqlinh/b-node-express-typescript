@@ -199,8 +199,7 @@ export class ApigatewayConstruct extends Construct {
         'application/json': `
             {
               "id": "$context.authorizer.id",
-              "shopId": "$context.authorizer.shopId",
-              "sessionId": "$context.authorizer.sessionId",
+              "account": "$context.authorizer.account",
               "method": "$context.httpMethod",
               "body" : $input.json('$'),
               "rawBody" : "$util.escapeJavaScript($input.body).replace("\\'", "'")",

@@ -5,16 +5,14 @@ import AuthService from '../services/auth.service';
 
 export const handler = wrapper(async (event: any, _context: any, callback): Promise<any> => {
   const auth = new AuthService();
-  const { authorizationToken, methodArn, user } = event;
-
-  Logger.INFO('USER ACCOUNT', user);
+  const { authorizationToken, methodArn } = event;
 
   try {
     const isVerified: any = await auth.verifyToken(authorizationToken.split(' ')[1]);
     Logger.INFO('VERIFICATION', isVerified);
 
     if (isVerified.email)  {
-      callback(null, generatePolicy('Allow', methodArn, { account: user }));
+      callback(null, generatePolicy('Allow', methodArn, { account: isVerified }));
     } else {
       callback('Unauthorized', generatePolicy('Deny', methodArn));
     }
