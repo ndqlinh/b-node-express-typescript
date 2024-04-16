@@ -14,10 +14,11 @@ export const wrapper =
       const token = authHeader && authHeader.split(' ')[1];
 
       const auth = new AuthService();
-      const user= await auth.verifyToken(token);
-      Logger.INFO('456456', user);
-      event.user = user;
-
+      const verifyResult: any = await auth.verifyToken(token);
+      Logger.INFO('verifyResult', verifyResult);
+      if (verifyResult.email) {
+        event.user = verifyResult;
+      }
       const result = await handler({ ...event } as any, context, callback);
       return result as any;
     } catch (error) {
