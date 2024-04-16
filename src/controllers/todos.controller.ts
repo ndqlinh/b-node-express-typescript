@@ -1,6 +1,4 @@
-import { HTTPStatus } from './../shared/enums/http.enum';
 import { wrapper } from '@shared/handler';
-import { Logger } from '@shared/helpers/logger.helper';
 import { BaseResponse } from '@shared/helpers/response.helper';
 import TodoService from '../services/todo.service';
 
