@@ -1,7 +1,6 @@
 import { wrapper } from '@shared/handler';
 import { BaseResponse } from '@shared/helpers/response.helper';
 import TodoService from '../services/todo.service';
-import { Logger } from '@shared/helpers/logger.helper';
 
 const todo = new TodoService();
 

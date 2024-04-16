@@ -4,7 +4,6 @@ import { TodoRepository } from '../repositories/todo.repository';
 import { TodoSchema } from '../validators/todo.schema';
 import { HttpException } from '@shared/helpers/exception.helper';
 import { HTTPStatus } from '@shared/enums/http.enum';
-import { Logger } from '@shared/helpers/logger.helper';
 
 export default class TodoService {
   private readonly todoRepository: TodoRepository;

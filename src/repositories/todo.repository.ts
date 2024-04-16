@@ -1,5 +1,5 @@
 import { Tables } from '@shared/enums/tables.enum';
-import DynamoDBConnector from '../shared/helpers/dynamodb.helper';
+import DynamoDBConnector from '@shared/helpers/dynamodb.helper';
 import { Todo } from '../models/todo.model';
 
 export class TodoRepository {
