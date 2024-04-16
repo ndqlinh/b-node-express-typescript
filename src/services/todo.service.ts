@@ -59,8 +59,24 @@ export default class TodoService {
       const todo = await this.todoRepository.find(id);
       return todo;
     } catch (error) {
-      Logger.INFO('Error while finding todo', error);
       throw new HttpException(HTTPStatus.INTERNAL_SERVER_ERROR, 'Find todo failed', error);
     }
   }
- }
+
+  async delete(id: string): Promise<void> {
+    if (!id) {
+      throw new HttpException(HTTPStatus.BAD_REQUEST, 'Missing todo id');
+    }
+
+    try {
+      const todo = await this.todoRepository.find(id);
+      if (!todo) {
+        throw new HttpException(HTTPStatus.NOT_FOUND, 'Todo not found');
+      } else {
+        await this.todoRepository.deleteById(id);
+      }
+    } catch (error) {
+      throw new HttpException(HTTPStatus.INTERNAL_SERVER_ERROR, 'Delete todo failed', error);
+    }
+  }
+}

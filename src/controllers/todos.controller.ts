@@ -3,10 +3,11 @@ import { BaseResponse } from '@shared/helpers/response.helper';
 import TodoService from '../services/todo.service';
 import { Logger } from '@shared/helpers/logger.helper';
 
+const todo = new TodoService();
+
 export const createTodo = wrapper(async (event: any, _context: any, callback): Promise<any> => {
   const { ownerId } = event;
   const requestBody = event.body;
-  const todo = new TodoService();
   const result = await todo.create({ ...requestBody, ownerId });
 
   return BaseResponse.toSuccess(result);
@@ -15,7 +16,6 @@ export const createTodo = wrapper(async (event: any, _context: any, callback): P
 export const updateTodo = wrapper(async (event: any, _context: any, callback): Promise<any> => {
   const { ownerId } = event;
   const { id, newTodo } = event.body;
-  const todo = new TodoService();
   const result = await todo.update(id, { ...newTodo, ownerId});
 
   return BaseResponse.toSuccess(result);
@@ -30,8 +30,12 @@ export const getTodos = wrapper(async (event: any, _context: any, callback): Pro
 
 export const findTodo = wrapper(async (event: any, _context: any, callback): Promise<any> => {
   const { id } = event.pathParameters;
-  Logger.INFO("Todo ID", id);
-  const todo = new TodoService();
   const result = await todo.find(id);
   return BaseResponse.toSuccess(result);
+});
+
+export const deleteTodo = wrapper(async (event: any, _context: any, callback): Promise<any> => {
+  const { id } = event.body;
+  await todo.delete(id);
+  return BaseResponse.toSuccess({ msg: `#${id} was deleted succesful` })
 });

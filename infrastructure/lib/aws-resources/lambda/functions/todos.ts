@@ -47,9 +47,19 @@ const todoFindFunction = new LambdaFunction({
   apiResourcePath: `${ROUTES.todos}/{id}`
 });
 
+const todoDeleteFunction = new LambdaFunction({
+  ...lambdaOpions,
+  functionName: 'TodoDelete',
+  handler: 'deleteTodo',
+  ssm: 'TodoDelete',
+  apiResourceMethod: 'DELETE',
+  apiResourcePath: ROUTES.todos
+})
+
 export const todoFunctions = [
   todoCreateFunction,
   todoUpdateFunction,
   todoListFunction,
-  todoFindFunction
+  todoFindFunction,
+  todoDeleteFunction
 ];
