@@ -4,7 +4,6 @@ import { ROUTES } from '@config/routes';
 import AccountService from '../services/account.service';
 import AuthService from '../services/auth.service';
 import { HTTPStatus } from '@shared/enums/http.enum';
-import { Logger } from '@shared/helpers/logger.helper';
 
 const app = express();
 
