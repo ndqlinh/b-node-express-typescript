@@ -50,8 +50,8 @@ export default class AuthService {
       throw new HttpException(HTTPStatus.UNAUTHORIZED, 'Invalid token');
     }
 
-    const newAccessToken = this.generateToken(account, '15m');
-    const newRefreshToken = this.generateToken(account, '1h');
+    const newAccessToken = await this.generateToken(account, '15m');
+    const newRefreshToken = await this.generateToken(account, '1h');
 
     return {
       accessToken: newAccessToken,
