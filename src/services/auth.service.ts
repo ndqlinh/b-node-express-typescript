@@ -13,16 +13,19 @@ export default class AuthService {
     this.ssmHelper = new SsmHelper();
   }
 
-  async generateToken(account: Account, expiresIn: string): Promise<string> {
+  private async getSecrets(): Promise<string> {
     const param = await this.ssmHelper.getParams('NodeExpressTokenSecret');
     const secretKey = param?.NodeExpressTokenSecret;
+    return secretKey;
+  }
 
+  async generateToken(account: Account, expiresIn: string): Promise<string> {
+    const secretKey = await this.getSecrets();
     return sign({ id: account.id, email: account.email }, secretKey, { expiresIn });
   }
 
   async verifyToken(token: string): Promise<string | object> {
-    const param = await this.ssmHelper.getParams('NodeExpressTokenSecret');
-    const secretKey = param?.NodeExpressTokenSecret;
+    const secretKey = await this.getSecrets();
 
     if (!token) {
       return new HttpException(HTTPStatus.UNAUTHORIZED, 'Unauthorized');
@@ -36,5 +39,25 @@ export default class AuthService {
     });
 
     return result;
+  }
+
+  async renewToken(account: Account, refreshToken: string): Promise<any> {
+    if (!refreshToken) {
+      throw new HttpException(HTTPStatus.BAD_REQUEST, 'Missing token');
+    }
+
+    const isValidToken = await this.verifyToken(refreshToken);
+
+    if (!isValidToken) {
+      throw new HttpException(HTTPStatus.UNAUTHORIZED, 'Invalid token');
+    }
+
+    const newAccessToken = this.generateToken(account, '15m');
+    const newRefreshToken = this.generateToken(account, '1h');
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken
+    }
   }
 }
