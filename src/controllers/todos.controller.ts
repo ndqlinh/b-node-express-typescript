@@ -36,5 +36,5 @@ export const findTodo = wrapper(async (event: any, _context: any, callback): Pro
 export const deleteTodo = wrapper(async (event: any, _context: any, callback): Promise<any> => {
   const { id } = event.body;
   await todo.delete(id);
-  return BaseResponse.toSuccess({ msg: `#${id} was deleted succesful` })
+  return BaseResponse.toSuccess({ msg: `#${id} was deleted successful` })
 });
