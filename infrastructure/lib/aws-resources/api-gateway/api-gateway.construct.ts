@@ -202,8 +202,8 @@ export class ApigatewayConstruct extends Construct {
               "ownerId": "$context.authorizer.ownerId",
               "email": "$context.authorizer.email",
               "method": "$context.httpMethod",
-              "body" : $input.json('$'),
-              "rawBody" : "$util.escapeJavaScript($input.body).replace("\\'", "'")",
+              "body": "$input.json('$')",
+              "rawBody": "$util.escapeJavaScript($input.body).replace("\\'", "'")",
               "headers": {
                 #foreach($param in $input.params().header.keySet())
                 "$param": "$util.escapeJavaScript($input.params().header.get($param))"
