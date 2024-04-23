@@ -25,6 +25,7 @@ export const wrapper =
       }
 
       const result = await handler({ ...event } as any, context, callback);
+      Logger.INFO('HANDLER RESULT', result);
       return result as any;
     } catch (error) {
       return BaseResponse.toError(error);

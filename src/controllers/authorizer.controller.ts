@@ -8,15 +8,19 @@ export const handler = wrapper(async (event: any, _context: any, callback): Prom
   const { authorizationToken, methodArn } = event;
 
   try {
-    const verifiedAccount: any = await auth.verifyToken(authorizationToken.split(' ')[1]);
-    Logger.INFO('VERIFICATION', verifiedAccount);
-    if (verifiedAccount.email) {
-      generatePolicy('Allow', methodArn, { ownerId: verifiedAccount.id, email: verifiedAccount.email })
-    } else {
-      generatePolicy('Deny', methodArn)
-    }
+    const verificationResult: any = await auth.verifyToken(authorizationToken.split(' ')[1]);
+    Logger.INFO('VERIFICATION', verificationResult);
+
+    return generatePolicy(
+      'Allow',
+      methodArn,
+      verificationResult.email && {
+        ownerId: verificationResult.id,
+        email: verificationResult.email
+      }
+    );
   } catch (err) {
     Logger.INFO('AUTHORIZE ERROR', err);
-    generatePolicy('Deny', methodArn)
+    return generatePolicy('Deny', methodArn)
   }
 });
