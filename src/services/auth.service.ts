@@ -3,6 +3,7 @@ import SsmHelper from '@shared/helpers/ssm.helper';
 import { Account } from '../models/account.model';
 import { HttpException } from '@shared/helpers/exception.helper';
 import { HTTPStatus } from '@shared/enums/http.enum';
+import { Logger } from '@shared/helpers/logger.helper';
 
 export default class AuthService {
   private readonly ssmHelper: SsmHelper;
@@ -31,6 +32,7 @@ export default class AuthService {
 
     const result: any = verify(token, secretKey, (error: any, decoded: any) => {
       if (error) {
+        Logger.INFO('VERIFY TOKEN ERROR', error);
         if (error.name === 'TokenExpiredError') {
           throw new HttpException(HTTPStatus.UNAUTHORIZED, 'Token has expired');
         } else {

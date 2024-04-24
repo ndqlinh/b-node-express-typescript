@@ -15,12 +15,14 @@ export const handler = wrapper(async (event: any, _context: any, callback): Prom
       ownerId: verificationResult.id,
       email: verificationResult.email
     });
-  } catch (error: any) {
-    Logger.INFO('AUTHORIZE ERROR', error);
+  } catch (err: any) {
+    Logger.INFO('AUTHORIZE ERROR', err);
+    const { statusCode, message, error } = err;
     return {
-      statusCode: error.code,
+      statusCode,
       body: JSON.stringify({
-        message: error.errorMsg
+        message,
+        error
       })
     };
   }
