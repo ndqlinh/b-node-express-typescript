@@ -8,7 +8,8 @@ export const handler = wrapper(async (event: any, _context: any, callback): Prom
   const { authorizationToken, methodArn } = event;
 
   try {
-    const verificationResult: any = await auth.verifyToken(authorizationToken.split(' ')[1]);
+    const token = authorizationToken.replace('Bearer', '').trim();
+    const verificationResult: any = await auth.verifyToken(token);
     Logger.INFO('VERIFICATION RESULT', verificationResult);
 
     return generatePolicy('Allow', methodArn, {
