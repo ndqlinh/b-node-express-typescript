@@ -34,9 +34,9 @@ export default class AuthService {
       if (error) {
         Logger.INFO('VERIFY TOKEN ERROR', error);
         if (error.name === 'TokenExpiredError') {
-          throw new HttpException(HTTPStatus.UNAUTHORIZED, 'Token has expired');
+          throw new HttpException(HTTPStatus.UNAUTHORIZED, 'Token has expired', error);
         } else {
-          throw new HttpException(HTTPStatus.FORBIDDEN, error.message);
+          throw new HttpException(HTTPStatus.FORBIDDEN, error.message, error);
         }
       } else {
         return decoded;
