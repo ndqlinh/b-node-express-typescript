@@ -1,5 +1,4 @@
 import { Logger } from './helpers/logger.helper';
-import { BaseResponse } from './helpers/response.helper';
 
 export const wrapper =
   (handler: (event: any, context: any, callback: any) => Promise<any>): any =>
@@ -13,6 +12,10 @@ export const wrapper =
       Logger.INFO('HANDLER RESULT', result);
       return result as any;
     } catch (error) {
-      return BaseResponse.toError(error);
+      Logger.INFO('HANDLER ERROR', error);
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: 'Unauthorized' })
+      };
     }
   };

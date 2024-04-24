@@ -26,15 +26,15 @@ export default class AuthService {
     const secretKey = await this.getSecrets();
 
     if (!token) {
-      return new HttpException(HTTPStatus.UNAUTHORIZED, 'Unauthorized');
+      throw new HttpException(HTTPStatus.UNAUTHORIZED, 'Unauthorized');
     }
 
     const result: any = verify(token, secretKey, (error: any, decoded: any) => {
       if (error) {
         if (error.name === 'TokenExpiredError') {
-          return new HttpException(HTTPStatus.UNAUTHORIZED, 'Token has expired');
+          throw new HttpException(HTTPStatus.UNAUTHORIZED, 'Token has expired');
         } else {
-          return new HttpException(HTTPStatus.FORBIDDEN, error.message);
+          throw new HttpException(HTTPStatus.FORBIDDEN, error.message);
         }
       } else {
         return decoded;

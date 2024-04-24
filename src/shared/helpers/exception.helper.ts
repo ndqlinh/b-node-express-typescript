@@ -1,14 +1,14 @@
 import { HTTPStatus } from '../enums/http.enum';
 
 export class HttpException extends Error {
-  code: HTTPStatus;
-  errorMsg: string;
-  internalError?: any;
+  statusCode: HTTPStatus;
+  message: string;
+  error?: any;
 
-  constructor(code: HTTPStatus, errorMsg: string, internalError?: any) {
+  constructor(statusCode: HTTPStatus, message: string, error?: any) {
     super();
-    this.code = code;
-    this.errorMsg = errorMsg;
-    this.internalError = internalError;
+    this.statusCode = statusCode;
+    this.message = message;
+    this.error = error;
   }
 }
