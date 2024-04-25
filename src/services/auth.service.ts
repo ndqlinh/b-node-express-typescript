@@ -32,7 +32,6 @@ export default class AuthService {
 
     const result: any = verify(token, secretKey, (error: any, decoded: any) => {
       if (error) {
-        Logger.INFO('VERIFY TOKEN ERROR', error);
         if (error.name === 'TokenExpiredError') {
           throw new HttpException(HTTPStatus.UNAUTHORIZED, 'Token has expired', error);
         } else {

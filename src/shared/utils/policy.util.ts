@@ -1,9 +1,13 @@
 import { AUTH_PRINCIPAL_ID_POLICY, AUTH_VERSION_POLICY } from '../constants';
 
 export const generatePolicy = (effect: 'Allow' | 'Deny', resource: string, context?: any) => {
-  return {
+  const authResponse: any = {
     principalId: AUTH_PRINCIPAL_ID_POLICY,
-    policyDocument: {
+    context: { ...context }
+  };
+
+  if (effect && resource) {
+    const policyDocument: any = {
       Version: AUTH_VERSION_POLICY,
       Statement: [
         {
@@ -12,7 +16,17 @@ export const generatePolicy = (effect: 'Allow' | 'Deny', resource: string, conte
           Resource: resource
         }
       ]
-    },
-    context: { ...context }
-  };
+    };
+    authResponse.policyDocument = policyDocument;
+  }
+
+  return authResponse;
 };
+
+export const generateAllow = (resource: string, context?: any) => {
+  return generatePolicy('Allow', resource, context);
+};
+
+export const generateDeny = (resource: string, context?: any) => {
+  return generatePolicy('Deny', resource, context);
+}
