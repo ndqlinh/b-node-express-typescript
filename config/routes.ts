@@ -3,5 +3,6 @@ export const ROUTES = {
   signin: '/api/auth/signin',
   renew: '/api/auth/renew',
   auth: '/api/auth/{proxy+}',
-  todos: '/api/todos'
+  todos: '/api/todos',
+  shopify: '/api/shopify',
 }
