@@ -1,15 +1,20 @@
 import { LambdaFunction } from '../lambda.helper';
 import { ROUTES } from '@config/routes';
+import { appConfig } from '@config/index';
 
-const callbackFunction = new LambdaFunction({
-  functionName: 'CarrierCallback',
+const shopifyProxyFunction = new LambdaFunction({
+  functionName: 'ShopifyProxy',
   entry: 'shopify.controller.ts',
-  handler: 'onCheckout',
-  ssm: 'CarrierCallback',
-  apiResourceMethod: 'POST',
-  apiResourcePath: ROUTES.shopify
+  ssm: 'ShopifyProxy',
+  apiResourceMethod: 'ANY',
+  isApiProxy: true,
+  apiResourcePath: ROUTES.shopify,
+  apiKeyRequired: false,
+  environment: {
+    REGION: appConfig.profile.region
+  }
 });
 
 export const shopifyFunctions = [
-  callbackFunction
+  shopifyProxyFunction
 ];

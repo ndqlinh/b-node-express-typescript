@@ -1,10 +1,34 @@
-import { wrapper } from '@shared/handler';
-import { Logger } from '@shared/helpers/logger.helper';
-import { BaseResponse } from '@shared/helpers/response.helper';
+import express, { Request, Response } from 'express';
+import serverless from 'serverless-http';
+import { generateHashEmail } from '@shared/utils/common.util';
 
-export const onCheckout = wrapper(async (event: any, _context: any, callback): Promise<any> => {
-  // const requestBody = JSON.stringify(event.body);
-  Logger.INFO('REQUEST BODY', event);
+const app = express();
 
-  return BaseResponse.toSuccess('success');
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.post(`/api/shopify/carrier`, async (req: Request, res: Response, next) => {
+  const requestBody = req.body;
+  const defaultShippingRate = 500000;
+  const shippingFee = requestBody.rate.items.reduce((accumulator, item) => {
+    const fee = 100 * parseInt(item.properties.shippingFee.slice(1).replace(',', ''));
+    console.log('Accumulator: ', +accumulator);
+    console.log('Item fee: ', fee);
+    console.log('Sum', accumulator + fee);
+    return accumulator + fee;
+  }, 0);
+
+  return res.send({
+    rates: [
+      {
+        service_name: 'Carrier Rate',
+        description: 'Provided by carrier service',
+        service_code: generateHashEmail(`Carrier Shipping Rate ${Math.random()}`),
+        currency: 'VND',
+        total_price: shippingFee || defaultShippingRate
+      }
+    ]
+  });
 });
+
+export const handler = serverless(app);
