@@ -13,7 +13,7 @@ app.post(`${ROUTES.shopify}/carrier`, async (req: Request, res: Response, next) 
   const requestBody = req.body;
   const defaultShippingRate = 500000;
   const shippingFee = requestBody.rate.items.reduce((accumulator: number, item: any) => {
-    const fee = 100 * parseInt(item.properties['Shipping fee'].slice(1).replace(',', ''));
+    const fee = 100 * parseInt(item?.properties?.['Shipping fee']?.slice(1)?.replace(',', '') || 0);
     return accumulator + fee;
   }, 0);
 
