@@ -4,5 +4,6 @@ export const ROUTES = {
   renew: '/api/auth/renew',
   auth: '/api/auth/{proxy+}',
   todos: '/api/todos',
-  shopify: '/api/shopify/{proxy+}',
+  shopifyProxy: '/api/shopify/{proxy+}',
+  shopify: '/api/shopify',
 }

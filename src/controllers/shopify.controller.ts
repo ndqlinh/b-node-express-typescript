@@ -1,13 +1,14 @@
 import express, { Request, Response } from 'express';
 import serverless from 'serverless-http';
 import { generateHashEmail } from '@shared/utils/common.util';
+import { ROUTES } from '@config/routes';
 
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.post(`/api/shopify/carrier`, async (req: Request, res: Response, next) => {
+app.post(`${ROUTES.shopify}/carrier`, async (req: Request, res: Response, next) => {
   const requestBody = req.body;
   const defaultShippingRate = 500000;
   const shippingFee = requestBody.rate.items.reduce((accumulator, item) => {

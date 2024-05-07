@@ -8,7 +8,7 @@ const shopifyProxyFunction = new LambdaFunction({
   ssm: 'ShopifyProxy',
   apiResourceMethod: 'ANY',
   isApiProxy: true,
-  apiResourcePath: ROUTES.shopify,
+  apiResourcePath: ROUTES.shopifyProxy,
   apiKeyRequired: false,
   environment: {
     REGION: appConfig.profile.region
