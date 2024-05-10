@@ -2,7 +2,6 @@ import express, { Request, Response } from 'express';
 import serverless from 'serverless-http';
 import { generateHashEmail } from '@shared/utils/common.util';
 import { ROUTES } from '@config/routes';
-import { Logger } from '@shared/helpers/logger.helper';
 
 const app = express();
 
