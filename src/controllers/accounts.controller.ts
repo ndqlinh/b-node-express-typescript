@@ -4,9 +4,11 @@ import { ROUTES } from '@config/routes';
 import AccountService from '../services/account.service';
 import AuthService from '../services/auth.service';
 import { HTTPStatus } from '@shared/enums/http.enum';
+import cors from 'cors';
 
 const app = express();
 
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
