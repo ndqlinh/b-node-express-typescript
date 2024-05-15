@@ -30,7 +30,7 @@ export default class AccountService {
       if (existedEmail) {
         return {
           code: HTTPStatus.BAD_REQUEST,
-          errorMsg: `Email ${accountModel.email} already exists`
+          message: `Email ${accountModel.email} already exists`
         }
       } else {
         accountModel.password = await this.hashPassword(accountModel.password);
@@ -71,7 +71,7 @@ export default class AccountService {
     if (!tartgetAccount) {
       return {
         code: HTTPStatus.NOT_FOUND,
-        errorMsg: 'Account does not exist'
+        message: 'Account does not exist'
       }
     } else {
       const hashedPassword = await this.hashPassword(account.password);
@@ -82,7 +82,7 @@ export default class AccountService {
       } else {
         return {
           code: HTTPStatus.BAD_REQUEST,
-          errorMsg: 'Invalid email or password'
+          message: 'Invalid email or password'
         }
       }
     }

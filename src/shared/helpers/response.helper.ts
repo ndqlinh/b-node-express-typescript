@@ -29,7 +29,7 @@ export class BaseResponse implements BaseResponse {
   static toError = (error: Error | HttpException | any) => {
     const errorResponse = new BaseResponse();
     errorResponse.code = error instanceof HttpException ? error.code : HTTPStatus.INTERNAL_SERVER_ERROR;
-    errorResponse.error = error instanceof HttpException ? error.errorMsg : 'Internal Server Error';
+    errorResponse.error = error instanceof HttpException ? error.message : 'Internal Server Error';
     return errorResponse.format();
   };
 
