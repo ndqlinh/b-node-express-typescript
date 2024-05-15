@@ -16,7 +16,7 @@ app.post(ROUTES.register, async (req: Request, res: Response, next) => {
   const userInfo = req.body;
   const account = new AccountService();
   const registeredAcount = await account.register(userInfo);
-  return res.send(registeredAcount);
+  return res.status(registeredAcount.code).send(registeredAcount);
 });
 
 app.post(ROUTES.signin, async (req: Request, res: Response, next) => {
@@ -24,9 +24,9 @@ app.post(ROUTES.signin, async (req: Request, res: Response, next) => {
   const verifyResult = await account.verify(req.body);
   if (verifyResult.email) {
     const result = await account.login(verifyResult);
-    return res.send(result);
+    return res.status(result.code).send(result);
   } else {
-    return res.send(verifyResult);
+    return res.status(verifyResult.code).send(verifyResult);
   }
 });
 
@@ -37,11 +37,11 @@ app.post(ROUTES.renew, async (req: Request, res: Response, next) => {
   const isVerified: any = await auth.verifyToken(token);
 
   if (isVerified.email !== account.email) {
-    return res.send({ code: HTTPStatus.UNAUTHORIZED, message: 'Invalid token' });
+    return res.status(HTTPStatus.UNAUTHORIZED).send({ message: 'Invalid token' });
   }
 
   const newTokens = await auth.renewToken(account, token);
-  return res.send({ code: HTTPStatus.OK, ...newTokens });
+  return res.status(HTTPStatus.ACCEPTED).send({ ...newTokens });
 });
 
 export const handler = serverless(app);
