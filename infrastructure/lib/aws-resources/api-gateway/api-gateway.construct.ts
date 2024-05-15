@@ -275,9 +275,9 @@ export class ApigatewayConstruct extends Construct {
       const resource = this.restApi.root.resourceForPath(apiResource.path);
       if (appConfig.env !== 'local') {
         resource.addCorsPreflight({
-          allowOrigins: apiResource.allowOrigin!,
-          allowHeaders: apiResource.allowHeaders!,
-          allowMethods: apiResource.allowMethods!,
+          allowOrigins: ['*'],
+          allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
+          allowHeaders: ['Authorization', 'Content-Type'],
           allowCredentials: true,
           statusCode: 200
         });
