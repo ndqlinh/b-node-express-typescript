@@ -7,7 +7,9 @@ import {
   LogGroupLogDestination,
   PassthroughBehavior,
   RestApi,
-  TokenAuthorizer
+  TokenAuthorizer,
+  GatewayResponse,
+  ResponseType
 } from 'aws-cdk-lib/aws-apigateway';
 import {
   AnyPrincipal,
@@ -74,6 +76,17 @@ export class ApigatewayConstruct extends Construct {
       },
       deploy: true,
       policy: apiResourcePolicy
+    });
+
+    new GatewayResponse(this, 'MyGatewayResponse', {
+      restApi: this.restApi,
+      type: ResponseType.DEFAULT_4XX,
+      statusCode: '401',
+      templates: {
+        'application/json': `{
+          "message": "$context.authorizer.errorMessage"
+        }`
+      },
     });
 
     // Save API Gateway Ids to SSM Parameters Store

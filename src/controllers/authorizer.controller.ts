@@ -7,19 +7,16 @@ import { Context } from 'aws-lambda';
 export const handler = wrapper(async (event: any, context: Context, callback): Promise<any> => {
   const auth = new AuthService();
   const { authorizationToken, methodArn } = event;
+  const token = authorizationToken.split(' ')[1];
+  let authResponse = null;
 
   try {
-    const token = authorizationToken.replace('Bearer', '').trim();
-    const verificationResult: any = await auth.verifyToken(token);
-    Logger.INFO('VERIFICATION RESULT', verificationResult);
-    const policy = generateAllow(methodArn);
-
-    callback(null, policy, {
-      ownerId: verificationResult.id,
-      email: verificationResult.email
-    });
-  } catch (err: any) {
-    const policy = generateDeny(methodArn);
-    callback('Unauthorized', policy);
+    await auth.verifyToken(token);
+    authResponse = generateAllow(methodArn);
+  } catch (error) {
+    authResponse = generateDeny(methodArn);
   }
+
+  Logger.INFO('AUTH_RESPONSE: ', authResponse);
+  return authResponse;
 });
