@@ -1,10 +1,9 @@
 import { Logger } from '@shared/helpers/logger.helper';
-import { wrapper } from '../shared/handler';
 import { generateAllow, generateDeny } from '../shared/utils/policy.util';
 import AuthService from '../services/auth.service';
 import { Context } from 'aws-lambda';
 
-export const handler = wrapper(async (event: any, context: Context, callback): Promise<any> => {
+export const handler = async (event: any, context: Context, callback): Promise<any> => {
   const auth = new AuthService();
   const { authorizationToken, methodArn } = event;
   const token = authorizationToken.split(' ')[1];
@@ -19,4 +18,4 @@ export const handler = wrapper(async (event: any, context: Context, callback): P
 
   Logger.INFO('AUTH_RESPONSE: ', authResponse);
   return authResponse;
-});
+};
