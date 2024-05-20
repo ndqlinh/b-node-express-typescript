@@ -289,7 +289,7 @@ export class ApigatewayConstruct extends Construct {
       if (appConfig.env !== 'local') {
         resource.addCorsPreflight({
           allowOrigins: ['*'],
-          allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
+          allowMethods: ['OPTIONS', 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
           allowHeaders: ['Authorization', 'Content-Type'],
           allowCredentials: true,
           statusCode: 200
