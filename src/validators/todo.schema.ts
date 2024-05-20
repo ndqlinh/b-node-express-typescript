@@ -7,5 +7,6 @@ export const TodoSchema: Joi.ObjectSchema<TodoModel> = Joi.object({
   title: Joi.string().required(),
   description: Joi.string().allow(''),
   dueDate: Joi.string().allow(''),
-  priority: Joi.string().allow('')
+  priority: Joi.string().allow(''),
+  status: Joi.string().allow('')
 }).options({ allowUnknown: false });

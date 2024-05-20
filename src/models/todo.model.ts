@@ -7,6 +7,7 @@ export type Todo = {
   description?: string;
   dueDate?: string;
   priority?: 'low' | 'medium' | 'high';
+  status?: 'new' | 'in-progress' | 'done';
 }
 
 export class TodoModel extends Model implements Todo {
@@ -15,6 +16,7 @@ export class TodoModel extends Model implements Todo {
   description?: string;
   dueDate?: string;
   priority?: 'low' | 'medium' | 'high';
+  status?: 'new' | 'in-progress' | 'done';
 
   constructor(todo: Todo) {
     super();
@@ -24,5 +26,6 @@ export class TodoModel extends Model implements Todo {
     this.description = todo.description || '';
     this.dueDate = todo.dueDate || '';
     this.priority = todo.priority || 'low';
+    this.status = todo.status || 'new';
   }
 }
