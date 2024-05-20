@@ -6,7 +6,7 @@ export const generatePolicy = (effect: 'Allow' | 'Deny', resource: string, conte
   authResponse.principalId = AUTH_PRINCIPAL_ID_POLICY;
   if (effect && resource) {
     const policyDocument: any = {};
-    policyDocument.Version = '2012-10-17';
+    policyDocument.Version = AUTH_VERSION_POLICY;
     policyDocument.Statement = [];
     const statementOne: any = {};
     statementOne.Action = 'execute-api:Invoke';
