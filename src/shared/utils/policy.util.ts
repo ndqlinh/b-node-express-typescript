@@ -16,10 +16,12 @@ export const generatePolicy = (effect: 'Allow' | 'Deny', resource: string, conte
     authResponse.policyDocument = policyDocument;
   }
 
-  // Optional output with custom properties of the String, Number or Boolean type.
-  authResponse.context = {
-    errorMessage: 'You are not authorized to access this resource',
-  };
+  if (effect === 'Deny') {
+    // Optional output with custom properties of the String, Number or Boolean type.
+    authResponse.context = {
+      errorMessage: 'You are not authorized to access this resource',
+    };
+  }
 
   return authResponse;
 };

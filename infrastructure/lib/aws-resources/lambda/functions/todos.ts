@@ -17,7 +17,7 @@ const todoCreateFunction = new LambdaFunction({
   handler: 'createTodo',
   ssm: 'TodoCreate',
   apiResourceMethod: 'POST',
-  apiResourcePath: ROUTES.todos
+  apiResourcePath: ROUTES.todo
 });
 
 const todoUpdateFunction = new LambdaFunction({
@@ -26,7 +26,7 @@ const todoUpdateFunction = new LambdaFunction({
   handler: 'updateTodo',
   ssm: 'TodoUpdate',
   apiResourceMethod: 'PUT',
-  apiResourcePath: ROUTES.todos
+  apiResourcePath: ROUTES.todo
 });
 
 const todoListFunction = new LambdaFunction({
@@ -35,7 +35,7 @@ const todoListFunction = new LambdaFunction({
   handler: 'getTodos',
   ssm: 'TodoList',
   apiResourceMethod: 'GET',
-  apiResourcePath: ROUTES.todos
+  apiResourcePath: ROUTES.todo
 });
 
 const todoFindFunction = new LambdaFunction({
@@ -44,7 +44,7 @@ const todoFindFunction = new LambdaFunction({
   handler: 'findTodo',
   ssm: 'TodoFind',
   apiResourceMethod: 'GET',
-  apiResourcePath: `${ROUTES.todos}/{id}`
+  apiResourcePath: `${ROUTES.todo}/{id}`
 });
 
 const todoDeleteFunction = new LambdaFunction({
@@ -53,7 +53,7 @@ const todoDeleteFunction = new LambdaFunction({
   handler: 'deleteTodo',
   ssm: 'TodoDelete',
   apiResourceMethod: 'DELETE',
-  apiResourcePath: ROUTES.todos
+  apiResourcePath: ROUTES.todo
 })
 
 export const todoFunctions = [
