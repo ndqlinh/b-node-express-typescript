@@ -78,16 +78,16 @@ export class ApigatewayConstruct extends Construct {
       policy: apiResourcePolicy
     });
 
-    // new GatewayResponse(this, 'MyGatewayResponse', {
-    //   restApi: this.restApi,
-    //   type: ResponseType.DEFAULT_4XX,
-    //   statusCode: '401',
-    //   templates: {
-    //     'application/json': `{
-    //       "message": "$context.authorizer.errorMessage"
-    //     }`
-    //   },
-    // });
+    new GatewayResponse(this, 'MyGatewayResponse', {
+      restApi: this.restApi,
+      type: ResponseType.DEFAULT_4XX,
+      statusCode: '401',
+      templates: {
+        'application/json': `{
+          "message": "$context.authorizer.errorMessage"
+        }`
+      },
+    });
 
     // Save API Gateway Ids to SSM Parameters Store
     if (appConfig.env !== 'local') {
@@ -209,79 +209,76 @@ export class ApigatewayConstruct extends Construct {
     return new LambdaIntegration(handler, {
       proxy: isProxy,
       requestTemplates: {
-        'application/json': `
-            {
-              "id": "$context.authorizer.id",
-              "ownerId": "$context.authorizer.ownerId",
-              "email": "$context.authorizer.email",
-              "method": "$context.httpMethod",
-              "body" : $input.json('$'),
-              "rawBody" : "$util.escapeJavaScript($input.body).replace("\\'", "'")",
-              "headers": {
-                #foreach($param in $input.params().header.keySet())
-                "$param": "$util.escapeJavaScript($input.params().header.get($param))"
-                #if($foreach.hasNext),#end
-                #end
-              },
-              "pathParameters": {
-                #foreach($param in $input.params().path.keySet())
-                "$param": "$util.escapeJavaScript($input.params().path.get($param))"
-                #if($foreach.hasNext),#end
-                #end
-              },
-              "queryStringParameters": {
-                #foreach($param in $input.params().querystring.keySet())
-                "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
-                #if($foreach.hasNext),#end
-                #end
-              },
-              "multiValueQueryStringParameters": {
-                #foreach($key in $method.request.multivaluequerystring.keySet())
-                "$key" : [
-                  #foreach($val in $method.request.multivaluequerystring.get($key))
-                  "$val"#if($foreach.hasNext),#end
-                  #end
-                  ]#if($foreach.hasNext),#end
-                #end
-              }
-            }
-          `,
-          'application/x-www-form-urlencoded': `
-            {
-              "id": "$context.authorizer.id",
-              "ownerId": "$context.authorizer.ownerId",
-              "email": "$context.authorizer.email",
-              "method": "$context.httpMethod",
-              "body" : $input.json('$'),
-              "rawBody" : "$util.escapeJavaScript($input.body).replace("\\'", "'")",
-              "headers": {
-                #foreach($param in $input.params().header.keySet())
-                "$param": "$util.escapeJavaScript($input.params().header.get($param))"
-                #if($foreach.hasNext),#end
-                #end
-              },
-              "pathParameters": {
-                #foreach($param in $input.params().path.keySet())
-                "$param": "$util.escapeJavaScript($input.params().path.get($param))"
-                #if($foreach.hasNext),#end
-                #end
-              },
-              "queryStringParameters": {
-                #foreach($param in $input.params().querystring.keySet())
-                "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
-                #if($foreach.hasNext),#end
-                #end
-              },
-              "multiValueQueryStringParameters": {
-                #foreach($key in $method.request.multivaluequerystring.keySet())
-                "$key" : [
-                  #foreach($val in $method.request.multivaluequerystring.get($key))
-                  "$val"#if($foreach.hasNext),#end
-                  #end
-                  ]#if($foreach.hasNext),#end
-                #end
-              }
-            }`
+        'application/json': `{
+          "id": "$context.authorizer.id",
+          "ownerId": "$context.authorizer.ownerId",
+          "email": "$context.authorizer.email",
+          "method": "$context.httpMethod",
+          "body" : $input.json('$'),
+          "rawBody" : "$util.escapeJavaScript($input.body).replace("\\'", "'")",
+          "headers": {
+            #foreach($param in $input.params().header.keySet())
+            "$param": "$util.escapeJavaScript($input.params().header.get($param))"
+            #if($foreach.hasNext),#end
+            #end
+          },
+          "pathParameters": {
+            #foreach($param in $input.params().path.keySet())
+            "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+            #if($foreach.hasNext),#end
+            #end
+          },
+          "queryStringParameters": {
+            #foreach($param in $input.params().querystring.keySet())
+            "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
+            #if($foreach.hasNext),#end
+            #end
+          },
+          "multiValueQueryStringParameters": {
+            #foreach($key in $method.request.multivaluequerystring.keySet())
+            "$key" : [
+              #foreach($val in $method.request.multivaluequerystring.get($key))
+              "$val"#if($foreach.hasNext),#end
+              #end
+              ]#if($foreach.hasNext),#end
+            #end
+          }
+        }`,
+        'application/x-www-form-urlencoded': `{
+          "id": "$context.authorizer.id",
+          "ownerId": "$context.authorizer.ownerId",
+          "email": "$context.authorizer.email",
+          "method": "$context.httpMethod",
+          "body" : $input.json('$'),
+          "rawBody" : "$util.escapeJavaScript($input.body).replace("\\'", "'")",
+          "headers": {
+            #foreach($param in $input.params().header.keySet())
+            "$param": "$util.escapeJavaScript($input.params().header.get($param))"
+            #if($foreach.hasNext),#end
+            #end
+          },
+          "pathParameters": {
+            #foreach($param in $input.params().path.keySet())
+            "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+            #if($foreach.hasNext),#end
+            #end
+          },
+          "queryStringParameters": {
+            #foreach($param in $input.params().querystring.keySet())
+            "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
+            #if($foreach.hasNext),#end
+            #end
+          },
+          "multiValueQueryStringParameters": {
+            #foreach($key in $method.request.multivaluequerystring.keySet())
+            "$key" : [
+              #foreach($val in $method.request.multivaluequerystring.get($key))
+              "$val"#if($foreach.hasNext),#end
+              #end
+              ]#if($foreach.hasNext),#end
+            #end
+          }
+        }`
       },
       integrationResponses: [
         {
