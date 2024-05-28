@@ -6,5 +6,6 @@ export const ROUTES = {
   todo: '/api/todo',
   shopifyProxy: '/api/shopify/{proxy+}',
   shopify: '/api/shopify',
-  profile: '/api/profile'
+  profile: '/api/profile',
+  task: 'api/task'
 }
