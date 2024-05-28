@@ -7,5 +7,5 @@ export const ROUTES = {
   shopifyProxy: '/api/shopify/{proxy+}',
   shopify: '/api/shopify',
   profile: '/api/profile',
-  task: 'api/task'
+  task: '/api/task'
 }

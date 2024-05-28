@@ -4,7 +4,7 @@ import { TODOS_TABLE_NAME } from '@db/dynamodb/tables';
 import { DynamodbPermission } from '@common/types/dynamodb.type';
 
 const lambdaOpions = {
-  entry: 'todo.controller.ts',
+  entry: 'tasks.controller.ts',
   auth: true,
   apiResourcePath: ROUTES.task,
   dynamodbTables: {
