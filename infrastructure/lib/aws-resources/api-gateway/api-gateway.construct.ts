@@ -78,16 +78,16 @@ export class ApigatewayConstruct extends Construct {
       policy: apiResourcePolicy
     });
 
-    new GatewayResponse(this, 'MyGatewayResponse', {
-      restApi: this.restApi,
-      type: ResponseType.DEFAULT_4XX,
-      statusCode: '401',
-      templates: {
-        'application/json': `{
-          "message": "$context.authorizer.errorMessage"
-        }`
-      },
-    });
+    // new GatewayResponse(this, 'MyGatewayResponse', {
+    //   restApi: this.restApi,
+    //   type: ResponseType.DEFAULT_4XX,
+    //   statusCode: '401',
+    //   templates: {
+    //     'application/json': `{
+    //       "message": "$context.authorizer.errorMessage"
+    //     }`
+    //   },
+    // });
 
     // Save API Gateway Ids to SSM Parameters Store
     if (appConfig.env !== 'local') {
