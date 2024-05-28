@@ -21,6 +21,8 @@ export const generatePolicy = (effect: 'Allow' | 'Deny', resource: string, conte
     authResponse.context = {
       errorMessage: 'You are not authorized to access this resource',
     };
+  } else {
+    authResponse.context = { ...context };
   }
 
   return authResponse;

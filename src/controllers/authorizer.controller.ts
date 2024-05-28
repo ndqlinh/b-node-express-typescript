@@ -10,8 +10,12 @@ export const handler = async (event: any, context: Context, callback): Promise<a
   let authResponse = null;
 
   try {
-    await auth.verifyToken(token);
-    authResponse = generateAllow(methodArn);
+    const verifiedToken: any = await auth.verifyToken(token);
+    Logger.INFO('Verified token', verifiedToken);
+    authResponse = generateAllow(methodArn, {
+      ownerId: verifiedToken.id,
+      email: verifiedToken.email
+    });
   } catch (error) {
     authResponse = generateDeny(methodArn);
   }

@@ -215,8 +215,8 @@ export class ApigatewayConstruct extends Construct {
               "ownerId": "$context.authorizer.ownerId",
               "email": "$context.authorizer.email",
               "method": "$context.httpMethod",
-              "body": "$input.json('$')",
-              "rawBody": "$util.escapeJavaScript($input.body).replace("\\'", "'")",
+              "body" : $input.json('$'),
+              "rawBody" : "$util.escapeJavaScript($input.body).replace("\\'", "'")",
               "headers": {
                 #foreach($param in $input.params().header.keySet())
                 "$param": "$util.escapeJavaScript($input.params().header.get($param))"
@@ -245,7 +245,43 @@ export class ApigatewayConstruct extends Construct {
                 #end
               }
             }
-          `
+          `,
+          'application/x-www-form-urlencoded': `
+            {
+              "id": "$context.authorizer.id",
+              "ownerId": "$context.authorizer.ownerId",
+              "email": "$context.authorizer.email",
+              "method": "$context.httpMethod",
+              "body" : $input.json('$'),
+              "rawBody" : "$util.escapeJavaScript($input.body).replace("\\'", "'")",
+              "headers": {
+                #foreach($param in $input.params().header.keySet())
+                "$param": "$util.escapeJavaScript($input.params().header.get($param))"
+                #if($foreach.hasNext),#end
+                #end
+              },
+              "pathParameters": {
+                #foreach($param in $input.params().path.keySet())
+                "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+                #if($foreach.hasNext),#end
+                #end
+              },
+              "queryStringParameters": {
+                #foreach($param in $input.params().querystring.keySet())
+                "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
+                #if($foreach.hasNext),#end
+                #end
+              },
+              "multiValueQueryStringParameters": {
+                #foreach($key in $method.request.multivaluequerystring.keySet())
+                "$key" : [
+                  #foreach($val in $method.request.multivaluequerystring.get($key))
+                  "$val"#if($foreach.hasNext),#end
+                  #end
+                  ]#if($foreach.hasNext),#end
+                #end
+              }
+            }`
       },
       integrationResponses: [
         {
@@ -289,7 +325,7 @@ export class ApigatewayConstruct extends Construct {
       if (appConfig.env !== 'local') {
         resource.addCorsPreflight({
           allowOrigins: ['*'],
-          allowMethods: ['OPTIONS', 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+          allowMethods: ['OPTIONS', 'GET', 'POST', 'PUT', 'DELETE'],
           allowHeaders: ['Authorization', 'Content-Type'],
           allowCredentials: true,
           statusCode: 200
