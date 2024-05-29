@@ -50,7 +50,8 @@ const taskDeleteFunction = new LambdaFunction({
   functionName: 'TaskDelete',
   handler: 'deleteTask',
   ssm: 'TaskDelete',
-  apiResourceMethod: 'DELETE'
+  apiResourceMethod: 'DELETE',
+  apiResourcePath: `${ROUTES.task}/{id}`
 })
 
 export const taskFunctions = [
