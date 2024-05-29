@@ -40,5 +40,8 @@ export const deleteTask = async (event: any, _context: any): Promise<any> => {
   const { id } = event.pathParameters;
   await todo.delete(id);
 
-  return BaseResponse.toSuccess({ msg: `#${id} was deleted successful` })
+  return BaseResponse.toSuccess({
+    id,
+    msg: `#${id} was deleted successful`
+  })
 };
