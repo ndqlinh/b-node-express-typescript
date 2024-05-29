@@ -14,9 +14,8 @@ export const createTask = async (event: any, _context: any): Promise<any> => {
 };
 
 export const updateTask = async (event: any, _context: any): Promise<any> => {
-  const { ownerId } = event;
-  const { id, newTodo } = event.body;
-  const result = await todo.update(id, { ...newTodo, ownerId});
+  const updateData = event.body;
+  const result = await todo.update(updateData.id, updateData);
 
   return BaseResponse.toSuccess(result);
 };
