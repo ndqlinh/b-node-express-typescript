@@ -82,6 +82,13 @@ export class ApigatewayConstruct extends Construct {
       restApi: this.restApi,
       type: ResponseType.DEFAULT_4XX,
       statusCode: '401',
+      responseHeaders: {
+        'Access-Control-Allow-Origin': `'*'`,
+        'Access-Control-Allow-Methods': "'OPTIONS,POST,GET,PUT,DELETE'",
+        'Access-Control-Allow-Headers': "'Content-Type,Authorization'",
+        'Cache-Control': "'no-store, no-cache, must-revalidate'",
+        'X-Frame-Options': "'SAMEORIGIN'"
+      },
       templates: {
         'application/json': `{
           "message": "$context.authorizer.errorMessage"
