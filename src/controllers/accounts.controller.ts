@@ -5,6 +5,7 @@ import AccountService from '../services/account.service';
 import AuthService from '../services/auth.service';
 import { HTTPStatus } from '@shared/enums/http.enum';
 import cors from 'cors';
+import { Logger } from '@shared/helpers/logger.helper';
 
 const app = express();
 
@@ -31,17 +32,16 @@ app.post(ROUTES.signin, async (req: Request, res: Response, next) => {
 });
 
 app.post(ROUTES.renew, async (req: Request, res: Response, next) => {
-  const account = req.body;
   const token = req.headers.authorization.split(' ')[1];
   const auth = new AuthService();
-  const isVerified: any = await auth.verifyToken(token);
-
-  if (isVerified.email !== account.email) {
-    return res.status(HTTPStatus.UNAUTHORIZED).send({ message: 'Invalid token' });
+  const verifiedResult: any = await auth.verifyToken(token);
+  Logger.INFO('verifiedResult', verifiedResult);
+  if (!verifiedResult.id) {
+    return res.status(verifiedResult.statusCode).send({ message: verifiedResult.message });
   }
 
-  const newTokens = await auth.renewToken(account, token);
-  return res.status(HTTPStatus.ACCEPTED).send({ ...newTokens });
+  const newAccessToken = await auth.renewToken(verifiedResult, token);
+  return res.status(HTTPStatus.ACCEPTED).send({ data: newAccessToken });
 });
 
 export const handler = serverless(app);

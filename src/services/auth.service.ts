@@ -32,10 +32,11 @@ export default class AuthService {
 
     const result: any = verify(token, secretKey, (error: any, decoded: any) => {
       if (error) {
+        Logger.INFO('Error', error);
         if (error.name === 'TokenExpiredError') {
-          throw new HttpException(HTTPStatus.UNAUTHORIZED, 'Token has expired', error);
+          return new HttpException(HTTPStatus.UNAUTHORIZED, 'Token has expired', error);
         } else {
-          throw new HttpException(HTTPStatus.FORBIDDEN, error.message, error);
+          return new HttpException(HTTPStatus.FORBIDDEN, error.message, error);
         }
       } else {
         return decoded;
@@ -49,19 +50,7 @@ export default class AuthService {
     if (!refreshToken) {
       throw new HttpException(HTTPStatus.BAD_REQUEST, 'Missing token');
     }
-
-    const isValidToken = await this.verifyToken(refreshToken);
-
-    if (!isValidToken) {
-      throw new HttpException(HTTPStatus.UNAUTHORIZED, 'Invalid token');
-    }
-
-    const newAccessToken = await this.generateToken(account, '15m');
-    const newRefreshToken = await this.generateToken(account, '1h');
-
-    return {
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken
-    }
+    const newAccessToken = await this.generateToken(account, '1m');
+    return newAccessToken
   }
 }
