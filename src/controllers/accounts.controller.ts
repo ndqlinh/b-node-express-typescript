@@ -41,7 +41,7 @@ app.post(ROUTES.renew, async (req: Request, res: Response, next) => {
   }
 
   const newAccessToken = await auth.renewToken(verifiedResult, token);
-  return res.status(HTTPStatus.ACCEPTED).send({ data: newAccessToken });
+  return res.status(HTTPStatus.OK).send({ data: newAccessToken });
 });
 
 export const handler = serverless(app);
