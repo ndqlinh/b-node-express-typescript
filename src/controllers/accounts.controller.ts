@@ -32,10 +32,10 @@ app.post(ROUTES.signin, async (req: Request, res: Response, next) => {
 });
 
 app.post(ROUTES.renew, async (req: Request, res: Response, next) => {
-  const token = req.headers.authorization.split(' ')[1];
+  const { token } = req.body
   const auth = new AuthService();
   const verifiedResult: any = await auth.verifyToken(token);
-  Logger.INFO('verifiedResult', verifiedResult);
+
   if (!verifiedResult.id) {
     return res.status(verifiedResult.statusCode).send({ message: verifiedResult.message });
   }
