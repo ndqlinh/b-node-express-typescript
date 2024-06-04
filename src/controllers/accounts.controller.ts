@@ -15,6 +15,13 @@ app.use(express.json());
 
 app.post(ROUTES.register, async (req: Request, res: Response, next) => {
   const userInfo = req.body;
+
+  if (userInfo.password === userInfo.confirmPassword) {
+    delete userInfo.confirmPassword;
+  } else {
+    return res.status(HTTPStatus.BAD_REQUEST).send({ message: 'Password is not matched' });
+  }
+
   const account = new AccountService();
   const registeredAcount = await account.register(userInfo);
   return res.status(registeredAcount.code).send(registeredAcount);
