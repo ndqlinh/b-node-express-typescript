@@ -1,9 +1,7 @@
 import { BaseResponse } from '@shared/helpers/response.helper';
 import ProfileService from '../services/profile.service';
-import AuthService from '../services/auth.service';
 
 const user = new ProfileService();
-const auth = new AuthService();
 
 export const getProfileDetail = async (event: any, _context: any, callback) => {
   const { email } = event;
@@ -11,3 +9,11 @@ export const getProfileDetail = async (event: any, _context: any, callback) => {
 
   return BaseResponse.toSuccess(profile);
 };
+
+export const updateProfile = async (event: any, _context: any) => {
+  const { email } = event;
+  const updateData = event.body;
+  const updateResult = await user.updateProfile(email, updateData);
+
+  return BaseResponse.toSuccess(updateResult);
+}

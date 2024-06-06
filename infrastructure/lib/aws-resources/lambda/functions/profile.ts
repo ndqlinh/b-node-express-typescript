@@ -32,6 +32,16 @@ const profileDetailFunction = new LambdaFunction({
   apiResourcePath: ROUTES.profile
 });
 
+const profileUpdateFunction = new LambdaFunction({
+  ...lambdaOpions,
+  functionName: 'ProfileUpdate',
+  handler: 'updateProfile',
+  ssm: 'ProfileUpdate',
+  apiResourceMethod: 'PUT',
+  apiResourcePath: ROUTES.profile
+});
+
 export const profileFunctions = [
-  profileDetailFunction
+  profileDetailFunction,
+  profileUpdateFunction
 ];
