@@ -26,7 +26,7 @@ export default class ProfileService {
     }
   }
 
-  async updateProfile(email: string, updateData: any): Promise<Profile> {
+  async updateProfileByEmail(email: string, updateData: any): Promise<Profile> {
     if (!email) {
       throw new HttpException(HTTPStatus.BAD_REQUEST, 'Missing email');
     }

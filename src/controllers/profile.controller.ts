@@ -13,7 +13,7 @@ export const getProfileDetail = async (event: any, _context: any, callback) => {
 export const updateProfile = async (event: any, _context: any) => {
   const { email } = event;
   const updateData = event.body;
-  const updateResult = await user.updateProfile(email, updateData);
+  const updateResult = await user.updateProfileByEmail(email, updateData);
 
   return BaseResponse.toSuccess(updateResult);
 }
