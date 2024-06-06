@@ -41,7 +41,17 @@ const profileUpdateFunction = new LambdaFunction({
   apiResourcePath: ROUTES.profile
 });
 
+const profilePasswordUpdateFunction = new LambdaFunction({
+  ...lambdaOpions,
+  functionName: 'PasswordUpdate',
+  handler: 'updatePassword',
+  ssm: 'PasswordUpdate',
+  apiResourceMethod: 'PUT',
+  apiResourcePath: ROUTES.resetPassword
+});
+
 export const profileFunctions = [
   profileDetailFunction,
-  profileUpdateFunction
+  profileUpdateFunction,
+  profilePasswordUpdateFunction
 ];

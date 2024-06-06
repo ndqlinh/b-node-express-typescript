@@ -17,3 +17,11 @@ export const updateProfile = async (event: any, _context: any) => {
 
   return BaseResponse.toSuccess(updateResult);
 }
+
+export const updatePassword = async (event: any, _context: any) => {
+  const { email } = event;
+  const updateData = event.body;
+
+  const updateResult = await user.updatePassword(email, updateData);
+  return BaseResponse.toSuccess(updateResult);
+}
