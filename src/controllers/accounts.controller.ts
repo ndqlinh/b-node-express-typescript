@@ -1,16 +1,42 @@
 import express, { Request, Response } from 'express';
+import session from 'express-session';
+import cors from 'cors';
 import serverless from 'serverless-http';
-import { ROUTES } from '@config/routes';
+import passport from 'passport';
+
 import AccountService from '../services/account.service';
 import AuthService from '../services/auth.service';
+import SsoService from '../services/sso.service';
+import { ROUTES } from '@config/routes';
 import { HTTPStatus } from '@shared/enums/http.enum';
-import cors from 'cors';
+import { PASSPORT_NAMESPACE } from '@shared/constants';
+import { passportAuthenticate } from '../middlewares/auth.middleware';
+import { Logger } from '@shared/helpers/logger.helper';
 
 const app = express();
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'secret',
+    resave: false, // or true if you want to save the session even if it wasn't modified
+    saveUninitialized: true // or true if you want to save a new session that hasn't been modified
+  })
+);
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user: any, cb) => {
+  cb(null, user);
+});
+
+passport.deserializeUser((obj: any, cb) => {
+  cb(null, obj);
+});
 
 app.post(ROUTES.register, async (req: Request, res: Response, next) => {
   const userInfo = req.body;
@@ -49,5 +75,29 @@ app.post(ROUTES.renew, async (req: Request, res: Response, next) => {
   const newAccessToken = await auth.renewToken(verifiedResult, token);
   return res.status(HTTPStatus.OK).send({ data: newAccessToken });
 });
+
+app.post(ROUTES.sso, async (req: Request, res: Response, next) => {
+  const { idp } = req.body;
+  Logger.INFO('SELECTED IDP', idp);
+
+  try {
+    const sso = new SsoService();
+    const strategy = sso.getStrategy();
+    passport.use(PASSPORT_NAMESPACE, strategy);
+  } catch (error) {
+    Logger.ERROR('Error when apply passport strategy: ', { error });
+    return res.send(HTTPStatus.INTERNAL_SERVER_ERROR).send({
+      message: 'Error when apply passport strategy'
+    });
+  }
+  next();
+}, passport.authenticate(PASSPORT_NAMESPACE));
+
+const handleSsoCallback = async (req: Request, res: Response) => {
+  Logger.INFO('SSO Callback Handler', req.user);
+};
+
+app.get(ROUTES.ssoCallback, passportAuthenticate, handleSsoCallback);
+app.post(ROUTES.ssoCallback, passportAuthenticate, handleSsoCallback);
 
 export const handler = serverless(app);
