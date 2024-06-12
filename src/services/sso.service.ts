@@ -48,7 +48,9 @@ export default class SsoService {
         ...{
           clientID: clientId.GoogleClientId,
           clientSecret: clientSecret.GoogleClientSecret
-        }
+        },
+        state: true,
+        skipUserProfile: false
       };
       Logger.INFO('CONFIGURATION', configuration);
       return new OAuth2Strategy(configuration, this.callbackHandler);
@@ -58,7 +60,7 @@ export default class SsoService {
   }
 
   async getUserProfile(accessToken: string) {
-    const response = await fetch(SUPPORT_IDP.google.userInfoUrl, {
+    const response = await fetch(SUPPORT_IDP.google.userInfoURL, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
