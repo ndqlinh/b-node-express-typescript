@@ -1,13 +1,14 @@
 import OAuth2Strategy from 'passport-oauth2';
 import { SUPPORT_IDP } from '@shared/constants';
 import { decodeToken } from '@shared/utils/jwt.util';
+import SsmHelper from '@shared/helpers/ssm.helper';
 import { Logger } from '@shared/helpers/logger.helper';
 
 export default class SsoService {
-  strategy: OAuth2Strategy;
+  private readonly ssmHelper: SsmHelper;
 
   constructor() {
-    this.strategy = new OAuth2Strategy(SUPPORT_IDP.google, this.callbackHandler);
+    this.ssmHelper = new SsmHelper();
   }
 
   async callbackHandler(accessToken: string, refreshToken: string, params: any, profile: any, done: any) {
@@ -38,8 +39,22 @@ export default class SsoService {
     }
   }
 
-  getStrategy() {
-    return this.strategy;
+  async getStrategy(idp: 'google' | 'facebook') {
+    if (idp === 'google') {
+      const clientId = await this.ssmHelper.getParams('GoogleClientId');
+      const clientSecret = await this.ssmHelper.getParams('GoogleClientSecret');
+      const configuration = {
+        ...SUPPORT_IDP.google,
+        ...{
+          clientID: clientId.GoogleClientId,
+          clientSecret: clientSecret.GoogleClientSecret
+        }
+      };
+      Logger.INFO('CONFIGURATION', configuration);
+      return new OAuth2Strategy(configuration, this.callbackHandler);
+    } else {
+      throw new Error('Unsupported IDP');
+    }
   }
 
   async getUserProfile(accessToken: string) {

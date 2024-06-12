@@ -82,7 +82,8 @@ app.post(ROUTES.sso, async (req: Request, res: Response, next) => {
 
   try {
     const sso = new SsoService();
-    const strategy = sso.getStrategy();
+    const strategy = await sso.getStrategy(idp);
+    Logger.INFO('STRATEGY', strategy);
     passport.use(PASSPORT_NAMESPACE, strategy);
   } catch (error) {
     Logger.ERROR('Error when apply passport strategy: ', { error });
