@@ -76,14 +76,12 @@ app.post(ROUTES.renew, async (req: Request, res: Response, next) => {
   return res.status(HTTPStatus.OK).send({ data: newAccessToken });
 });
 
-app.post(ROUTES.sso, async (req: Request, res: Response, next) => {
-  const { idp } = req.body;
-  Logger.INFO('SELECTED IDP', idp);
+app.get(ROUTES.sso, async (req: Request, res: Response, next) => {
+  const queryParams = req.query;
 
   try {
     const sso = new SsoService();
-    const strategy = await sso.getStrategy(idp);
-    Logger.INFO('STRATEGY', strategy);
+    const strategy = await sso.getStrategy(queryParams.idp as 'google' | 'facebook');
     passport.use(PASSPORT_NAMESPACE, strategy);
   } catch (error) {
     Logger.ERROR('Error when apply passport strategy: ', { error });

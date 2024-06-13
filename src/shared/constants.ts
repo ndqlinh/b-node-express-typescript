@@ -9,7 +9,9 @@ export const SUPPORT_IDP = {
     tokenURL: 'https://www.googleapis.com/oauth2/v4/token',
     userInfoURL: 'https://www.googleapis.com/oauth2/v3/userinfo',
     callbackURL: 'https://d17dt631lzwisd.cloudfront.net/api/auth/sso/callback',
-    scope: 'email profile openid'
+    scope: 'email profile openid',
+    state: true,
+    skipUserProfile: false
   },
   facebook: {
     authorizationURL: 'https://www.example.com/oauth2/authorize',
