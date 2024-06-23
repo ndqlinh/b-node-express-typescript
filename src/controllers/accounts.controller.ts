@@ -12,6 +12,8 @@ import { HTTPStatus } from '@shared/enums/http.enum';
 import { PASSPORT_NAMESPACE } from '@shared/constants';
 import { passportAuthenticate } from '../middlewares/auth.middleware';
 import { Logger } from '@shared/helpers/logger.helper';
+import ProfileService from '../services/profile.service';
+import { Account } from '../models/account.model';
 
 const app = express();
 
@@ -94,7 +96,22 @@ app.post(ROUTES.sso, async (req: Request, res: Response, next) => {
 }, passport.authenticate(PASSPORT_NAMESPACE));
 
 const handleSsoCallback = async (req: Request, res: Response) => {
-  Logger.INFO('SSO Callback Handler', req.user);
+  const { user } = req as any;
+  Logger.INFO('SSO Callback Handler', user);
+  if (user.email) {
+    const profile = new ProfileService();
+    const existedAccount = profile.findByEmail(user.email);
+    Logger.INFO('Existed Account', existedAccount);
+    if (!!existedAccount) {
+      // Return tokens
+      // const account = new AccountService();
+      // const result = account.login(existedAccount);
+    } else {
+      // Redirect to create password page
+    }
+  } else {
+    // Redirect to error page
+  }
 };
 
 app.get(ROUTES.ssoCallback, passportAuthenticate, handleSsoCallback);
