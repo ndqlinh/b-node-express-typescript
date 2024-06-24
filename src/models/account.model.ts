@@ -7,7 +7,8 @@ export type Account = {
   gender?: string,
   dob?: string,
   firstName?: string,
-  lastName?: string
+  lastName?: string,
+  isSso?: boolean
 }
 
 export class AccountModel extends Model implements Account {
@@ -17,6 +18,7 @@ export class AccountModel extends Model implements Account {
   dob?: string;
   firstName?: string;
   lastName?: string
+  isSso?: boolean;
 
   constructor(account: Account) {
     super();
@@ -27,5 +29,6 @@ export class AccountModel extends Model implements Account {
     this.dob = account.dob || '';
     this.firstName = account.firstName || '';
     this.lastName = account.lastName || '';
+    this.isSso = account.isSso || false;
   }
 }

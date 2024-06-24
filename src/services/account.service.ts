@@ -45,7 +45,7 @@ export default class AccountService {
     }
   }
 
-  async login(account: Account): Promise<any> {
+  async login(account: any): Promise<any> {
     const accessToken = await this.auth.generateToken(account, '1m');
     const refreshToken = await this.auth.generateToken(account, '15m');
 

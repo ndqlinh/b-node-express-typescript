@@ -18,7 +18,7 @@ export default class AuthService {
     return secretKey;
   }
 
-  async generateToken(account: Account, expiresIn: string): Promise<string> {
+  async generateToken(account: any, expiresIn: string): Promise<string> {
     const secretKey = await this.getSecrets();
     return sign({ id: account.id, email: account.email }, secretKey, { expiresIn });
   }

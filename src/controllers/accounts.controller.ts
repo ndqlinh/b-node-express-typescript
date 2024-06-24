@@ -3,6 +3,7 @@ import session from 'express-session';
 import cors from 'cors';
 import serverless from 'serverless-http';
 import passport from 'passport';
+import crypto from 'crypto';
 
 import AccountService from '../services/account.service';
 import AuthService from '../services/auth.service';
@@ -12,6 +13,7 @@ import { HTTPStatus } from '@shared/enums/http.enum';
 import { PASSPORT_NAMESPACE } from '@shared/constants';
 import { passportAuthenticate } from '../middlewares/auth.middleware';
 import { Logger } from '@shared/helpers/logger.helper';
+import ProfileService from '../services/profile.service';
 
 const app = express();
 
@@ -94,6 +96,31 @@ app.get(ROUTES.sso, async (req: Request, res: Response, next) => {
 
 const handleSsoCallback = async (req: Request, res: Response) => {
   Logger.INFO('SSO Callback Handler', req.user);
+  const user: any = req.user;
+  const profile = new ProfileService();
+  const account = new AccountService();
+  const existingAccount = await profile.findByEmail(user?.email);
+  let authenticatedInfo: any;
+
+  if (existingAccount) {
+    // Update user profile
+    authenticatedInfo = await account.login(existingAccount);
+    return res.redirect(`https://${process.env.DOMAIN}/account/login?data=${authenticatedInfo.data}`);
+  } else {
+    // Create new user
+    const newAccount = {
+      email: user.email,
+      firstName: user.given_name,
+      lastName: user.family_name,
+      password: crypto.randomBytes(32).toString('hex'),
+      isSso: true
+    };
+    const registeredAccount = await account.register(newAccount);
+    if (registeredAccount.code === HTTPStatus.OK) {
+      authenticatedInfo = await account.login(registeredAccount.data);
+      return res.redirect(`https://${process.env.DOMAIN}/account/login?data=${authenticatedInfo.data}`);
+    }
+  }
 };
 
 app.get(ROUTES.ssoCallback, passportAuthenticate, handleSsoCallback);
