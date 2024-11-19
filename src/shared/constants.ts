@@ -14,9 +14,10 @@ export const SUPPORT_IDP = {
     skipUserProfile: false
   },
   facebook: {
-    authorizationURL: 'https://www.example.com/oauth2/authorize',
-    tokenURL: 'https://www.example.com/oauth2/token',
-    userInfoURL: 'https://www.googleapis.com/oauth2/v4/userinfo',
+    authorizationURL: 'https://www.facebook.com/v21.0/dialog/oauth',
+    tokenURL: 'https://graph.facebook.com/v21.0/oauth/access_token',
+    userInfoURL: 'https://graph.facebook.com/v16.0/me',
+    profileFields: ['public_profile', 'email', 'user_birthday'],
     callbackURL: 'https://d17dt631lzwisd.cloudfront.net/api/auth/sso/callback'
   }
 }

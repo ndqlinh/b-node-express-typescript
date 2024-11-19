@@ -2,7 +2,6 @@ import OAuth2Strategy from 'passport-oauth2';
 import { jwtDecode } from 'jwt-decode';
 
 import { SUPPORT_IDP } from '@shared/constants';
-// import { decodeToken } from '@shared/utils/jwt.util';
 import SsmHelper from '@shared/helpers/ssm.helper';
 
 export default class SsoService {
@@ -12,7 +11,7 @@ export default class SsoService {
     this.ssmHelper = new SsmHelper();
   }
 
-  async callbackHandler(accessToken: string, refreshToken: string, params: any, profile: any, done: any) {
+  async callbackHandler(idp: 'google' | 'facebook', accessToken: string, refreshToken: string, params: any, profile: any, done: any) {
     try {
       let userProfile = profile || {};
 
@@ -25,7 +24,7 @@ export default class SsoService {
 
       // Get user profile from userInfoURL
       if (accessToken) {
-        const response = await fetch(SUPPORT_IDP.google.userInfoURL, {
+        const response = await fetch(SUPPORT_IDP[idp].userInfoURL, {
           headers: {
             Authorization: `Bearer ${accessToken}`
           }
@@ -41,20 +40,18 @@ export default class SsoService {
   }
 
   async getStrategy(idp: 'google' | 'facebook') {
-    if (idp === 'google') {
-      const clientId = await this.ssmHelper.getParams('GoogleClientId');
-      const clientSecret = await this.ssmHelper.getParams('GoogleClientSecret');
-      const configuration = {
-        ...SUPPORT_IDP.google,
-        ...{
-          clientID: clientId,
-          clientSecret: clientSecret
-        }
-      };
-      return new OAuth2Strategy(configuration, this.callbackHandler);
-    } else {
+    if (!SUPPORT_IDP[idp]) {
       throw new Error('Unsupported IDP');
     }
+
+    const configurations: any = {
+      ...SUPPORT_IDP[idp],
+      ...{
+        clientID: idp === 'google' ? await this.ssmHelper.getParams('GoogleClientId') : await this.ssmHelper.getParams('FacebookAppId'),
+        clientSecret: idp === 'google' ? await this.ssmHelper.getParams('GoogleClientSecret') : await this.ssmHelper.getParams('FacebookAppSecret')
+      }
+    };
+    return new OAuth2Strategy(configurations, (accessToken: string, refreshToken: string, params: any, profile: any, done: any) => this.callbackHandler(idp, accessToken, refreshToken, params, profile, done));
   }
 
   async getUserProfile(accessToken: string) {
