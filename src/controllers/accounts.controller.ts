@@ -4,7 +4,6 @@ import cors from 'cors';
 import serverless from 'serverless-http';
 import passport from 'passport';
 import crypto from 'crypto';
-import queryString from 'query-string';
 import { sign } from 'jsonwebtoken';
 
 import AccountService from '../services/account.service';
@@ -133,7 +132,6 @@ const handleSsoCallback = async (req: Request, res: Response) => {
   const ssmHelper = new SsmHelper();
   const ssmParams = await ssmHelper.getParams('NodeExpressAppDomain');
   const existingAccount = await profile.findByEmail(user?.email);
-  // let authenticatedInfo: any;
   let encryptToken: string = '';
   let code: string = '';
 
@@ -146,11 +144,11 @@ const handleSsoCallback = async (req: Request, res: Response) => {
     encryptToken = token.FacebookAppSecret;
   }
 
-
   if (existingAccount) {
-    // Update user profile
-    // authenticatedInfo = await account.login(existingAccount);
-    // Logger.INFO('Authenticated Info', authenticatedInfo.data);
+    await profile.updateProfileByEmail(user.email, {
+      firstName: user.given_name,
+      lastName: user.family_name,
+    });
     code = sign({
       email: user.email,
       id: existingAccount.id
@@ -167,8 +165,6 @@ const handleSsoCallback = async (req: Request, res: Response) => {
     };
     const registeredAccount = await account.register(newAccount);
     if (registeredAccount.code === HTTPStatus.OK) {
-      // authenticatedInfo = await account.login(registeredAccount.data);
-      // Logger.INFO('Authenticated Info', authenticatedInfo.data);
       code = sign({
         email: user.email,
         id: registeredAccount.data.id
