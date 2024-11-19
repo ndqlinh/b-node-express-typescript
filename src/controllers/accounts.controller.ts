@@ -97,20 +97,10 @@ app.get(ROUTES.sso, async (req: Request, res: Response, next) => {
 }, passport.authenticate(PASSPORT_NAMESPACE));
 
 app.post(ROUTES.authorization, async (req: Request, res: Response, next) => {
-  const { code, provider } = req.body;
+  const { code } = req.body;
   const auth = new AuthService();
-  const ssmHelper = new SsmHelper();
-  let decryptToken: string = '';
 
-  if (provider === 'google') {
-    const token = await ssmHelper.getParams('GoogleClientSecret');
-    decryptToken = token.GoogleClientSecret;
-  } else {
-    const token = await ssmHelper.getParams('FacebookAppSecret');
-    decryptToken = token.FacebookAppSecret;
-  }
-
-  const verifiedResult: any = await auth.verifyToken(code, decryptToken);
+  const verifiedResult: any = await auth.verifyToken(code);
 
   if (!verifiedResult.email) {
     return res.status(HTTPStatus.UNAUTHORIZED).send({ message: verifiedResult.message });
@@ -121,7 +111,7 @@ app.post(ROUTES.authorization, async (req: Request, res: Response, next) => {
   const user = await profile.findByEmail(verifiedResult?.email);
   const authenticatedInfo = await account.login(user);
 
-  return res.status(HTTPStatus.OK).send({ data: verifiedResult });
+  return res.status(HTTPStatus.OK).send({ data: authenticatedInfo.data });
 });
 
 const handleSsoCallback = async (req: Request, res: Response) => {
@@ -132,17 +122,9 @@ const handleSsoCallback = async (req: Request, res: Response) => {
   const ssmHelper = new SsmHelper();
   const ssmParams = await ssmHelper.getParams('NodeExpressAppDomain');
   const existingAccount = await profile.findByEmail(user?.email);
-  let encryptToken: string = '';
+  const param = await ssmHelper.getParams('NodeExpressTokenSecret');
+  const secretKey = param?.NodeExpressTokenSecret;
   let code: string = '';
-
-  const provider = user.iss.includes('google') ? 'google' : 'facebook';
-  if (provider === 'google') {
-    const token = await ssmHelper.getParams('GoogleClientSecret');
-    encryptToken = token.GoogleClientSecret;
-  } else {
-    const token = await ssmHelper.getParams('FacebookAppSecret');
-    encryptToken = token.FacebookAppSecret;
-  }
 
   if (existingAccount) {
     await profile.updateProfileByEmail(user.email, {
@@ -152,8 +134,8 @@ const handleSsoCallback = async (req: Request, res: Response) => {
     code = sign({
       email: user.email,
       id: existingAccount.id
-    }, encryptToken, { expiresIn: '30s' });
-    return res.redirect(`${ssmParams.NodeExpressAppDomain}/auth/authorize?code=${code}&provider=${provider}`);
+    }, secretKey, { expiresIn: '30s' });
+    return res.redirect(`${ssmParams.NodeExpressAppDomain}/auth/authorize?code=${code}`);
   } else {
     // Create new user
     const newAccount = {
@@ -168,8 +150,8 @@ const handleSsoCallback = async (req: Request, res: Response) => {
       code = sign({
         email: user.email,
         id: registeredAccount.data.id
-      }, encryptToken, { expiresIn: '30s' });
-      return res.redirect(`${process.env.DOMAIN}/auth/authorize?code=${code}&provider=${provider}`);
+      }, secretKey, { expiresIn: '30s' });
+      return res.redirect(`${process.env.DOMAIN}/auth/authorize?code=${code}`);
     }
   }
 };
