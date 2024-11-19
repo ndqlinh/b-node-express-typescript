@@ -60,8 +60,8 @@ export default class AccountService {
   }
 
   async hashPassword(password: string): Promise<string> {
-    const param = await this.ssmHelper.getParams('NodeExpressTokenSecret');
-    const hashedPassword = crypto.createHash('md5').update(`${password}-${param?.NodeExpressTokenSecret}`).digest('hex');
+    const nodeExpressTokenSecret = await this.ssmHelper.getParams('NodeExpressTokenSecret');
+    const hashedPassword = crypto.createHash('md5').update(`${password}-${nodeExpressTokenSecret}`).digest('hex');
     return hashedPassword.toString();
   }
 

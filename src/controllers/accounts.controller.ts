@@ -121,10 +121,9 @@ const handleSsoCallback = async (req: Request, res: Response) => {
   const profile = new ProfileService();
   const account = new AccountService();
   const ssmHelper = new SsmHelper();
-  const ssmParams = await ssmHelper.getParams('NodeExpressAppDomain');
+  const appDomain = await ssmHelper.getParams('NodeExpressAppDomain');
+  const tokenSecret = await ssmHelper.getParams('NodeExpressTokenSecret');
   const existingAccount = await profile.findByEmail(user?.email);
-  const param = await ssmHelper.getParams('NodeExpressTokenSecret');
-  const secretKey = param?.NodeExpressTokenSecret;
   let code: string = '';
 
   if (existingAccount) {
@@ -135,8 +134,8 @@ const handleSsoCallback = async (req: Request, res: Response) => {
     code = sign({
       email: user.email,
       id: existingAccount.id
-    }, secretKey, { expiresIn: '30s' });
-    return res.redirect(`${ssmParams.NodeExpressAppDomain}/auth/authorize?code=${code}`);
+    }, tokenSecret, { expiresIn: '30s' });
+    return res.redirect(`${appDomain}/auth/authorize?code=${code}`);
   } else {
     // Create new user
     const newAccount = {
@@ -151,8 +150,8 @@ const handleSsoCallback = async (req: Request, res: Response) => {
       code = sign({
         email: user.email,
         id: registeredAccount.data.id
-      }, secretKey, { expiresIn: '30s' });
-      return res.redirect(`${process.env.DOMAIN}/auth/authorize?code=${code}`);
+      }, tokenSecret, { expiresIn: '30s' });
+      return res.redirect(`${appDomain}/auth/authorize?code=${code}`);
     }
   }
 };

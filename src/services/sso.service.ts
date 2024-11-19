@@ -47,8 +47,8 @@ export default class SsoService {
       const configuration = {
         ...SUPPORT_IDP.google,
         ...{
-          clientID: clientId.GoogleClientId,
-          clientSecret: clientSecret.GoogleClientSecret
+          clientID: clientId,
+          clientSecret: clientSecret
         }
       };
       return new OAuth2Strategy(configuration, this.callbackHandler);

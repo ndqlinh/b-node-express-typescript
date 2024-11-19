@@ -13,8 +13,7 @@ export default class AuthService {
   }
 
   private async getSecrets(): Promise<string> {
-    const param = await this.ssmHelper.getParams('NodeExpressTokenSecret');
-    const secretKey = param?.NodeExpressTokenSecret;
+    const secretKey = await this.ssmHelper.getParams('NodeExpressTokenSecret');
     return secretKey;
   }
 
