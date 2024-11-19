@@ -16,6 +16,7 @@ import { passportAuthenticate } from '../middlewares/auth.middleware';
 import { Logger } from '@shared/helpers/logger.helper';
 import ProfileService from '../services/profile.service';
 import SsmHelper from '@shared/helpers/ssm.helper';
+import { AccountRepository } from '../repositories/account.repository';
 
 const app = express();
 
@@ -106,9 +107,9 @@ app.post(ROUTES.authorization, async (req: Request, res: Response, next) => {
     return res.status(HTTPStatus.UNAUTHORIZED).send({ message: verifiedResult.message });
   }
 
-  const profile = new ProfileService();
+  const accountRepository = new AccountRepository();
   const account = new AccountService();
-  const user = await profile.findByEmail(verifiedResult?.email);
+  const user = await accountRepository.findByEmail(verifiedResult.email);
   const authenticatedInfo = await account.login(user);
 
   return res.status(HTTPStatus.OK).send({ data: authenticatedInfo.data });
