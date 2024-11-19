@@ -4,6 +4,8 @@ import cors from 'cors';
 import serverless from 'serverless-http';
 import passport from 'passport';
 import crypto from 'crypto';
+import queryString from 'query-string';
+import { sign } from 'jsonwebtoken';
 
 import AccountService from '../services/account.service';
 import AuthService from '../services/auth.service';
@@ -14,6 +16,7 @@ import { PASSPORT_NAMESPACE } from '@shared/constants';
 import { passportAuthenticate } from '../middlewares/auth.middleware';
 import { Logger } from '@shared/helpers/logger.helper';
 import ProfileService from '../services/profile.service';
+import SsmHelper from '@shared/helpers/ssm.helper';
 
 const app = express();
 
@@ -94,18 +97,65 @@ app.get(ROUTES.sso, async (req: Request, res: Response, next) => {
   next();
 }, passport.authenticate(PASSPORT_NAMESPACE));
 
+app.post(ROUTES.authorization, async (req: Request, res: Response, next) => {
+  const { code, provider } = req.body;
+  const auth = new AuthService();
+  const ssmHelper = new SsmHelper();
+  let decryptToken: string = '';
+
+  if (provider === 'google') {
+    const token = await ssmHelper.getParams('GoogleClientSecret');
+    decryptToken = token.GoogleClientSecret;
+  } else {
+    const token = await ssmHelper.getParams('FacebookAppSecret');
+    decryptToken = token.FacebookAppSecret;
+  }
+
+  const verifiedResult: any = await auth.verifyToken(code, decryptToken);
+
+  if (!verifiedResult.email) {
+    return res.status(HTTPStatus.UNAUTHORIZED).send({ message: verifiedResult.message });
+  }
+
+  const profile = new ProfileService();
+  const account = new AccountService();
+  const user = await profile.findByEmail(verifiedResult?.email);
+  const authenticatedInfo = await account.login(user);
+
+  return res.status(HTTPStatus.OK).send({ data: verifiedResult });
+});
+
 const handleSsoCallback = async (req: Request, res: Response) => {
   Logger.INFO('SSO Callback Handler', req.user);
   const user: any = req.user;
   const profile = new ProfileService();
   const account = new AccountService();
+  const ssmHelper = new SsmHelper();
+  const ssmParams = await ssmHelper.getParams('NodeExpressAppDomain');
   const existingAccount = await profile.findByEmail(user?.email);
-  let authenticatedInfo: any;
+  // let authenticatedInfo: any;
+  let encryptToken: string = '';
+  let code: string = '';
+
+  const provider = user.iss.includes('google') ? 'google' : 'facebook';
+  if (provider === 'google') {
+    const token = await ssmHelper.getParams('GoogleClientSecret');
+    encryptToken = token.GoogleClientSecret;
+  } else {
+    const token = await ssmHelper.getParams('FacebookAppSecret');
+    encryptToken = token.FacebookAppSecret;
+  }
+
 
   if (existingAccount) {
     // Update user profile
-    authenticatedInfo = await account.login(existingAccount);
-    return res.redirect(`https://${process.env.DOMAIN}/account/login?data=${authenticatedInfo.data}`);
+    // authenticatedInfo = await account.login(existingAccount);
+    // Logger.INFO('Authenticated Info', authenticatedInfo.data);
+    code = sign({
+      email: user.email,
+      id: existingAccount.id
+    }, encryptToken, { expiresIn: '30s' });
+    return res.redirect(`${ssmParams.NodeExpressAppDomain}/auth/authorize?code=${code}&provider=${provider}`);
   } else {
     // Create new user
     const newAccount = {
@@ -117,8 +167,13 @@ const handleSsoCallback = async (req: Request, res: Response) => {
     };
     const registeredAccount = await account.register(newAccount);
     if (registeredAccount.code === HTTPStatus.OK) {
-      authenticatedInfo = await account.login(registeredAccount.data);
-      return res.redirect(`https://${process.env.DOMAIN}/account/login?data=${authenticatedInfo.data}`);
+      // authenticatedInfo = await account.login(registeredAccount.data);
+      // Logger.INFO('Authenticated Info', authenticatedInfo.data);
+      code = sign({
+        email: user.email,
+        id: registeredAccount.data.id
+      }, encryptToken, { expiresIn: '30s' });
+      return res.redirect(`${process.env.DOMAIN}/auth/authorize?code=${code}&provider=${provider}`);
     }
   }
 };

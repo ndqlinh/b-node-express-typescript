@@ -28,6 +28,7 @@
     "jwt-decode": "^4.0.0",
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
+    "query-string": "^9.1.1",
     "serverless-http": "^3.2.0"
   },
   "devDependencies": {

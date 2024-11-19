@@ -23,8 +23,8 @@ export default class AuthService {
     return sign({ id: account.id, email: account.email }, secretKey, { expiresIn });
   }
 
-  async verifyToken(token: string): Promise<string | object> {
-    const secretKey = await this.getSecrets();
+  async verifyToken(token: string, secret?: string): Promise<string | object> {
+    const secretKey = secret || await this.getSecrets();
 
     if (!token) {
       throw new HttpException(HTTPStatus.UNAUTHORIZED, 'Unauthorized');
