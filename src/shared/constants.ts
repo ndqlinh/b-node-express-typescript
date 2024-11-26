@@ -17,7 +17,8 @@ export const SUPPORT_IDP = {
     authorizationURL: 'https://access.line.me/oauth2/v2.1/authorize',
     tokenURL: 'https://api.line.me/oauth2/v2.1/token',
     userInfoURL: 'https://api.line.me/v2/profile',
-    profileFields: ['profile', 'email', 'openid'],
+    scope: 'email profile openid',
+    state: true,
     callbackURL: 'https://d17dt631lzwisd.cloudfront.net/api/auth/sso/callback',
   },
 };
