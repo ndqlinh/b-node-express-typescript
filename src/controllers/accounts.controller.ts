@@ -24,7 +24,7 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET || 'secret',
     resave: false, // or true if you want to save the session even if it wasn't modified
-    saveUninitialized: true // or true if you want to save a new session that hasn't been modified
+    saveUninitialized: true, // or true if you want to save a new session that hasn't been modified
   })
 );
 
@@ -49,7 +49,9 @@ app.post(ROUTES.register, async (req: Request, res: Response, next) => {
   if (userInfo.password === userInfo.confirmPassword) {
     delete userInfo.confirmPassword;
   } else {
-    return res.status(HTTPStatus.BAD_REQUEST).send({ message: 'Password is not matched' });
+    return res
+      .status(HTTPStatus.BAD_REQUEST)
+      .send({ message: 'Password is not matched' });
   }
 
   const account = new AccountService();
@@ -69,33 +71,41 @@ app.post(ROUTES.signin, async (req: Request, res: Response, next) => {
 });
 
 app.post(ROUTES.renew, async (req: Request, res: Response, next) => {
-  const { token } = req.body
+  const { token } = req.body;
   const auth = new AuthService();
   const verifiedResult: any = await auth.verifyToken(token);
 
   if (!verifiedResult.id) {
-    return res.status(verifiedResult.statusCode).send({ message: verifiedResult.message });
+    return res
+      .status(verifiedResult.statusCode)
+      .send({ message: verifiedResult.message });
   }
 
   const newAccessToken = await auth.renewToken(verifiedResult, token);
   return res.status(HTTPStatus.OK).send({ data: newAccessToken });
 });
 
-app.get(ROUTES.sso, async (req: Request, res: Response, next) => {
-  const queryParams = req.query;
+app.get(
+  ROUTES.sso,
+  async (req: Request, res: Response, next) => {
+    const queryParams = req.query;
 
-  try {
-    const sso = new SsoService();
-    const strategy = await sso.getStrategy(queryParams.idp as 'google' | 'facebook');
-    passport.use(PASSPORT_NAMESPACE, strategy);
-  } catch (error) {
-    Logger.ERROR('Error when apply passport strategy: ', { error });
-    return res.send(HTTPStatus.INTERNAL_SERVER_ERROR).send({
-      message: 'Error when apply passport strategy'
-    });
-  }
-  next();
-}, passport.authenticate(PASSPORT_NAMESPACE));
+    try {
+      const sso = new SsoService();
+      const strategy = await sso.getStrategy(
+        queryParams.idp as 'google' | 'line'
+      );
+      passport.use(PASSPORT_NAMESPACE, strategy);
+    } catch (error) {
+      Logger.ERROR('Error when apply passport strategy: ', { error });
+      return res.send(HTTPStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Error when apply passport strategy',
+      });
+    }
+    next();
+  },
+  passport.authenticate(PASSPORT_NAMESPACE)
+);
 
 app.post(ROUTES.authorization, async (req: Request, res: Response, next) => {
   const { code } = req.body;
@@ -104,7 +114,9 @@ app.post(ROUTES.authorization, async (req: Request, res: Response, next) => {
   const verifiedResult: any = await auth.verifyToken(code);
 
   if (!verifiedResult.email) {
-    return res.status(HTTPStatus.UNAUTHORIZED).send({ message: verifiedResult.message });
+    return res
+      .status(HTTPStatus.UNAUTHORIZED)
+      .send({ message: verifiedResult.message });
   }
 
   const accountRepository = new AccountRepository();
@@ -131,10 +143,14 @@ const handleSsoCallback = async (req: Request, res: Response) => {
       firstName: user.given_name,
       lastName: user.family_name,
     });
-    code = sign({
-      email: user.email,
-      id: existingAccount.id
-    }, tokenSecret, { expiresIn: '30s' });
+    code = sign(
+      {
+        email: user.email,
+        id: existingAccount.id,
+      },
+      tokenSecret,
+      { expiresIn: '30s' }
+    );
     return res.redirect(`${appDomain}/auth/authorize?code=${code}`);
   } else {
     // Create new user
@@ -143,14 +159,18 @@ const handleSsoCallback = async (req: Request, res: Response) => {
       firstName: user.given_name,
       lastName: user.family_name,
       password: crypto.randomBytes(32).toString('hex'),
-      isSso: true
+      isSso: true,
     };
     const registeredAccount = await account.register(newAccount);
     if (registeredAccount.code === HTTPStatus.OK) {
-      code = sign({
-        email: user.email,
-        id: registeredAccount.data.id
-      }, tokenSecret, { expiresIn: '30s' });
+      code = sign(
+        {
+          email: user.email,
+          id: registeredAccount.data.id,
+        },
+        tokenSecret,
+        { expiresIn: '30s' }
+      );
       return res.redirect(`${appDomain}/auth/authorize?code=${code}`);
     }
   }

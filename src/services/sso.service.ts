@@ -11,7 +11,14 @@ export default class SsoService {
     this.ssmHelper = new SsmHelper();
   }
 
-  async callbackHandler(idp: 'google' | 'facebook', accessToken: string, refreshToken: string, params: any, profile: any, done: any) {
+  async callbackHandler(
+    idp: 'google' | 'facebook',
+    accessToken: string,
+    refreshToken: string,
+    params: any,
+    profile: any,
+    done: any
+  ) {
     try {
       let userProfile = profile || {};
 
@@ -26,8 +33,8 @@ export default class SsoService {
       if (accessToken) {
         const response = await fetch(SUPPORT_IDP[idp].userInfoURL, {
           headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
+            Authorization: `Bearer ${accessToken}`,
+          },
         });
         const profile = await response.json();
         userProfile = { ...userProfile, ...profile };
@@ -39,7 +46,7 @@ export default class SsoService {
     }
   }
 
-  async getStrategy(idp: 'google' | 'facebook') {
+  async getStrategy(idp: 'google' | 'line') {
     if (!SUPPORT_IDP[idp]) {
       throw new Error('Unsupported IDP');
     }
@@ -47,18 +54,41 @@ export default class SsoService {
     const configurations: any = {
       ...SUPPORT_IDP[idp],
       ...{
-        clientID: idp === 'google' ? await this.ssmHelper.getParams('GoogleClientId') : await this.ssmHelper.getParams('FacebookAppId'),
-        clientSecret: idp === 'google' ? await this.ssmHelper.getParams('GoogleClientSecret') : await this.ssmHelper.getParams('FacebookAppSecret')
-      }
+        clientID:
+          idp === 'google'
+            ? await this.ssmHelper.getParams('GoogleClientId')
+            : await this.ssmHelper.getParams('LineChannelId'),
+        clientSecret:
+          idp === 'google'
+            ? await this.ssmHelper.getParams('GoogleClientSecret')
+            : await this.ssmHelper.getParams('LineChannelSecret'),
+      },
     };
-    return new OAuth2Strategy(configurations, (accessToken: string, refreshToken: string, params: any, profile: any, done: any) => this.callbackHandler(idp, accessToken, refreshToken, params, profile, done));
+    return new OAuth2Strategy(
+      configurations,
+      (
+        accessToken: string,
+        refreshToken: string,
+        params: any,
+        profile: any,
+        done: any
+      ) =>
+        this.callbackHandler(
+          idp,
+          accessToken,
+          refreshToken,
+          params,
+          profile,
+          done
+        )
+    );
   }
 
   async getUserProfile(accessToken: string) {
     const response = await fetch(SUPPORT_IDP.google.userInfoURL, {
       headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
     const profile = await response.json();
     return profile;
