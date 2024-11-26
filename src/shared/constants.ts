@@ -11,13 +11,13 @@ export const SUPPORT_IDP = {
     callbackURL: 'https://d17dt631lzwisd.cloudfront.net/api/auth/sso/callback',
     scope: 'email profile openid',
     state: true,
-    skipUserProfile: false
+    skipUserProfile: false,
   },
-  facebook: {
-    authorizationURL: 'https://www.facebook.com/v21.0/dialog/oauth',
-    tokenURL: 'https://graph.facebook.com/v21.0/oauth/access_token',
-    userInfoURL: 'https://graph.facebook.com/v16.0/me',
-    profileFields: ['public_profile', 'email', 'user_birthday'],
-    callbackURL: 'https://d17dt631lzwisd.cloudfront.net/api/auth/sso/callback'
-  }
-}
+  line: {
+    authorizationURL: 'https://access.line.me/oauth2/v2.1/authorize',
+    tokenURL: 'https://api.line.me/oauth2/v2.1/token',
+    userInfoURL: 'https://api.line.me/v2/profile',
+    profileFields: ['profile', 'email', 'openid'],
+    callbackURL: 'https://d17dt631lzwisd.cloudfront.net/api/auth/sso/callback',
+  },
+};

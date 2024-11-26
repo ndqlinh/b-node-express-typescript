@@ -12,7 +12,7 @@ export default class SsoService {
   }
 
   async callbackHandler(
-    idp: 'google' | 'facebook',
+    idp: 'google' | 'line',
     accessToken: string,
     refreshToken: string,
     params: any,
