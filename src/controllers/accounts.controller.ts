@@ -140,7 +140,7 @@ const handleSsoCallback = async (req: Request, res: Response) => {
 
   if (existingAccount) {
     await profile.updateProfileByEmail(user.email, {
-      firstName: user.given_name,
+      firstName: user.given_name || user.displayName,
       lastName: user.family_name,
     });
     code = sign(
