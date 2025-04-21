@@ -19,7 +19,7 @@ export class LambdaConstruct extends Construct {
     const dynamodbTables = getDynamodbTables(scope);
     const defaultEnvironments: any = {
       ENVIRONMENT: process.env.ENVIRONMENT || 'dev',
-      REST_API_ID: getParameter(scope, appConfig.ssm.restApiId)
+      REST_API_ID: getParameter(scope, appConfig.ssm.restApiId),
     };
     // Create Lambda Function
     const result: { [key: string]: NodejsFunction } = {};
@@ -35,8 +35,9 @@ export class LambdaConstruct extends Construct {
         bundling: {
           target: 'es2020',
           sourceMap: false,
-          minify: true
-        }
+          minify: true,
+          nodeModules: ['crawlee', '@sparticuz/chromium'],
+        },
       });
 
       // Grant DynamoDB Access Permissions
@@ -81,8 +82,8 @@ export class LambdaConstruct extends Construct {
         metricNamespace: 'LambdaMetrics',
         metricName: `${func.functionName}MetricErrors`,
         filterPattern: {
-          logPatternString: 'Internal Server Error'
-        }
+          logPatternString: 'Internal Server Error',
+        },
       });
     });
     return result;

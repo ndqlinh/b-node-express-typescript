@@ -12,4 +12,5 @@ export const ROUTES = {
   profile: '/api/profile',
   task: '/api/task',
   resetPassword: '/api/reset-password',
-}
+  crawler: '/api/crawler',
+};
