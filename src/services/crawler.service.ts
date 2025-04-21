@@ -43,38 +43,35 @@ export default class CrawlerService {
     }
     this.crawlerDataset = await Dataset.open('crawled_dataset');
     const self = this;
-    this.crawler = new PlaywrightCrawler(
-      {
-        async requestHandler({ request, page, enqueueLinks, log }) {
-          const data = await page.$$eval('.items .item', ($posts) => {
-            const scrapedData: { title: string; href: string }[] = [];
-            $posts.forEach(($post) => {
-              scrapedData.push({
-                title: $post.querySelector('.ct_title a').textContent,
-                href: $post.querySelector('.ct_title a').getAttribute('href'),
-              });
+    this.crawler = new PlaywrightCrawler({
+      async requestHandler({ request, page, enqueueLinks, log }) {
+        const data = await page.$$eval('.items .item', ($posts) => {
+          const scrapedData: { title: string; href: string }[] = [];
+          $posts.forEach(($post) => {
+            scrapedData.push({
+              title: $post.querySelector('.ct_title a').textContent,
+              href: $post.querySelector('.ct_title a').getAttribute('href'),
             });
-
-            return scrapedData;
           });
-          await self.crawlerDataset.pushData({ data, url: request.loadedUrl });
-          await enqueueLinks();
+
+          return scrapedData;
+        });
+        await self.crawlerDataset.pushData({ data, url: request.loadedUrl });
+        await enqueueLinks();
+      },
+      launchContext: {
+        launchOptions: {
+          executablePath,
+          args: [
+            ...aws_chromium.args,
+            '--disable-dev-shm-usage',
+            '--single-process',
+          ],
+          headless: true,
         },
-        launchContext: {
-          launchOptions: {
-            executablePath,
-            args: [
-              ...aws_chromium.args,
-              '--disable-dev-shm-usage',
-              '--single-process',
-            ],
-            headless: true,
-          },
-        },
-        maxRequestsPerCrawl: this.numberOfMaxRequests,
-      }
-      // config
-    );
+      },
+      maxRequestsPerCrawl: this.numberOfMaxRequests,
+    });
   }
 
   async crawlDataSequentially(urls: string[]) {
