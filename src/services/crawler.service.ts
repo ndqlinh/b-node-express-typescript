@@ -23,10 +23,6 @@ export default class CrawlerService {
   }
 
   async initializeCrawler() {
-    // if (this.crawlerDataset) {
-    //   this.crawlerDataset.drop();
-    // }
-
     let executablePath: string;
     try {
       executablePath = await aws_chromium.executablePath();
@@ -76,10 +72,14 @@ export default class CrawlerService {
 
   async crawlDataSequentially(urls: string[]) {
     await this.crawler.run(urls);
-    const crawledPosts = await Dataset.getData();
     const { items } = await this.crawlerDataset.getData();
-    Logger.INFO('Crawler dataset:', items);
-
-    return crawledPosts;
+    const crawledDomain = items[0]?.url?.substring(
+      0,
+      items[0]?.url?.length - 1
+    );
+    const crawledPostUrls = items[0]?.data?.map(
+      (item: any) => `${crawledDomain}${item.href}`
+    );
+    return crawledPostUrls;
   }
 }

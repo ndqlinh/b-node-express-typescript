@@ -15,6 +15,6 @@ export const crawlMultipleUrls = async (
 
   return BaseResponse.toSuccess({
     message: 'Crawled data successfully!',
-    // data: result,
+    data: result,
   });
 };
