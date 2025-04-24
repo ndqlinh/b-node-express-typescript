@@ -1,7 +1,7 @@
 import * as util from 'util';
 
 export class Logger {
-  static INFO = (message: string, data: any) => {
+  static INFO = (message: string, data?: any) => {
     console.log(`${message} : `, util.inspect(data, true, null, false));
   };
 

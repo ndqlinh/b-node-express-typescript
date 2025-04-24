@@ -1,3 +1,4 @@
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { LambdaFunction } from '../lambda.helper';
 import { ROUTES } from '@config/routes';
 
@@ -14,6 +15,17 @@ const crawlMutlpleUrlsFunction = new LambdaFunction({
   apiResourceMethod: 'POST',
   memorySize: 1024,
   timeout: 900,
+  customPolicies: [
+      new PolicyStatement({
+        actions: [
+          'ssm:GetParameterHistory',
+          'ssm:GetParametersByPath',
+          'ssm:GetParameters',
+          'ssm:GetParameter'
+        ],
+        resources: ['*']
+      })
+    ]
 });
 
 export const crawlerFunctions = [crawlMutlpleUrlsFunction];

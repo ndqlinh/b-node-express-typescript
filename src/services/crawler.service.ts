@@ -1,10 +1,16 @@
-import { PlaywrightCrawler, Dataset, Configuration } from 'crawlee';
+import path from 'path';
+import {
+  PlaywrightCrawler,
+  Dataset,
+  Configuration,
+  RequestQueue,
+} from 'crawlee';
 import aws_chromium from '@sparticuz/chromium';
 
 import { HttpException } from '@shared/helpers/exception.helper';
 import { HTTPStatus } from '@shared/enums/http.enum';
 import { Logger } from '@shared/helpers/logger.helper';
-import path from 'path';
+import TelegramService from './telegram.service';
 
 interface CrawlConfig {
   urlListSelector: string;
@@ -17,11 +23,19 @@ export default class CrawlerService {
   pagePattern = /page\/\d+/i;
   urlCrawler = null;
   contentCrawler = null;
-  numberOfMaxRequests = 1;
+  numberOfMaxRequests = 1000;
+  minConcurrency = 1;
+  maxConcurrency = 5;
   urlCrawlerDataset = null;
   contentCrawlerDataset = null;
+  urlRequestQueue = null;
+  contentRequestQueue = null;
+  urlRequestList = null;
+  contentRequestList = null;
+  telegram: TelegramService;
 
   constructor() {
+    this.telegram = new TelegramService();
     const config = Configuration.getGlobalConfig();
     config.set('persistStorage', false);
     config.set('purgeOnStart', true);
@@ -54,24 +68,14 @@ export default class CrawlerService {
       headless: true,
     };
 
-    // Clear previous datasets if they exist
-    if (this.urlCrawlerDataset) {
-      await this.urlCrawlerDataset.drop();
-    }
-    if (this.contentCrawlerDataset) {
-      await this.contentCrawlerDataset.drop();
-    }
-
-    this.urlCrawlerDataset = await Dataset.open('url_crawler_dataset');
-    this.contentCrawlerDataset = await Dataset.open('content_crawler_dataset');
+    await this.cleanCrawler();
 
     const self = this;
-    this.numberOfMaxRequests = config.maxRequests || 1;
 
     // Initialize URL crawler - this will extract URLs from the specified selector
     this.urlCrawler = new PlaywrightCrawler({
       async requestHandler({ request, page, log }) {
-        log.info(`Crawling ${request.url} for URLs...`);
+        Logger.INFO(`Crawling for URLs...`, request.url);
         try {
           // Extract URLs from the specified selector
           const data = await page.$$eval(config.urlListSelector, (elements) => {
@@ -91,16 +95,23 @@ export default class CrawlerService {
           await self.urlCrawlerDataset.pushData({
             data,
             url: request.loadedUrl,
-            baseUrl: new URL(request.loadedUrl || '').origin
+            baseUrl: new URL(request.loadedUrl || '').origin,
           });
         } catch (error) {
           log.error(`Error crawling ${request.url}`, error);
         }
       },
+      failedRequestHandler({ request, log }) {
+        log.error(`Failed to crawl URL ${request.url}`);
+      },
+      requestQueue: this.urlRequestQueue,
       launchContext: {
         launchOptions,
       },
-      maxRequestsPerCrawl: this.numberOfMaxRequests,
+      maxRequestsPerCrawl: 1,
+      minConcurrency: this.minConcurrency,
+      maxConcurrency: this.maxConcurrency,
+      requestHandlerTimeoutSecs: 30,
     });
 
     // Initialize content crawler - this will extract text content from the specified selector
@@ -109,36 +120,63 @@ export default class CrawlerService {
         log.info(`Crawling ${request.url} for content...`);
         try {
           // Extract content from the specified selector
-          const content = await page.$$eval(config.contentSelector, (elements) => {
-            return elements.map((element) => ({
-              name: element.getElementsByClassName('name')[0].textContent?.trim() || '',
-              phone: element.getElementsByClassName('fone')[0].getElementsByTagName('a')[0].textContent?.trim() || '',
-            }));
-          });
+          const content = await page.$$eval(
+            config.contentSelector,
+            (elements) => {
+              return elements.map((element) => ({
+                name:
+                  element
+                    .getElementsByClassName('name')[0]
+                    .textContent?.trim() || '',
+                phone:
+                  element
+                    .getElementsByClassName('fone')[0]
+                    .getElementsByTagName('a')[0]
+                    .textContent?.trim()
+                    .replaceAll('.', '') || '',
+              }));
+            }
+          );
 
           await self.contentCrawlerDataset.pushData({
             content,
-            url: request.loadedUrl
+            url: request.loadedUrl,
           });
         } catch (error) {
           log.error(`Error crawling content from ${request.url}`, error);
         }
       },
+      failedRequestHandler({ request, log }) {
+        log.error(`Failed to crawl URL ${request.url}`);
+      },
+      requestQueue: this.contentRequestQueue,
       launchContext: {
         launchOptions,
       },
-      maxRequestsPerCrawl: 10 * this.numberOfMaxRequests, // More requests allowed for content crawling
+      maxRequestsPerCrawl: 5,
+      minConcurrency: this.minConcurrency,
+      maxConcurrency: this.maxConcurrency,
+      requestHandlerTimeoutSecs: 30,
     });
   }
 
-  async crawlDataSequentially(urls: string[], config: CrawlConfig) {
+  async crawlDataSequentially(
+    urls: string[],
+    config: CrawlConfig,
+    chatId?: string | number
+  ) {
+    Logger.INFO('Chat ID:', chatId);
     try {
       // First step: crawl the initial URLs to extract links
       await this.urlCrawler.run(urls);
       Logger.INFO('Initial URL crawling complete', urls);
 
       // Get the extracted URLs
-      const { items: urlItems } = await this.urlCrawlerDataset.getData({ offset: 0, limit: 1000 });
+      const { items: urlItems } = await this.urlCrawlerDataset.getData({
+        offset: 0,
+        limit: 1000,
+      });
+      Logger.INFO('Extracted URLs:', urlItems);
       if (!urlItems || urlItems.length === 0) {
         return { urlData: [], contentData: [] };
       }
@@ -166,12 +204,12 @@ export default class CrawlerService {
               } else {
                 fullUrl = `${baseUrl}/${dataItem.href}`;
               }
-
+              Logger.INFO('Full content URL:', fullUrl);
               contentUrls.push(fullUrl);
               extractedUrls.push({
                 title: dataItem.title,
                 originalHref: dataItem.href,
-                fullUrl
+                fullUrl,
               });
             }
           }
@@ -179,31 +217,93 @@ export default class CrawlerService {
 
         urlData.push({
           sourceUrl: item.url,
-          extractedUrls
+          extractedUrls,
         });
       }
 
       // Step 2: Crawl each extracted URL to get the content
-      if (contentUrls.length > 0) {
+      if (contentUrls.length) {
         await this.contentCrawler.run(contentUrls);
         Logger.INFO('Content crawling complete', contentUrls);
       }
 
       // Get the crawled content
-      const { items: contentItems } = await this.contentCrawlerDataset.getData({ offset: 0, limit: 1000 });
+      const { items: contentItems } = await this.contentCrawlerDataset.getData({
+        offset: 0,
+        limit: 1000,
+      });
+      const postsContent = contentItems.map((item) => {
+        return {
+          ...item.content[0],
+          crawledUrl: item.url,
+        };
+      });
+      Logger.INFO('Crawled posts content:', postsContent);
 
-      Logger.INFO('Content crawling complete', contentItems);
+      // Convert JSON to a formatted string message
+      let formattedMessage = 'Crawled Data:\n\n';
+
+      if (postsContent && postsContent.length > 0) {
+        formattedMessage += postsContent
+          .map((item) => {
+            // Create a line for each entry in format: Name: Phone
+            return `${item.name || 'Unknown'}: ${item.phone || 'No phone'}`;
+          })
+          .join('\n');
+      } else {
+        formattedMessage += 'No data found.';
+      }
+
+      // Add crawl information
+      formattedMessage += `\n\nTotal entries: ${
+        postsContent.length
+      }\nCrawled on: ${new Date().toLocaleString()}`;
+
+      // Send the formatted message to Telegram
+      await this.telegram.sendMessage(
+        String(chatId || '1003418810'),
+        formattedMessage
+      );
 
       return {
         urlData,
-        contentData: contentItems || []
+        contentData: contentItems || [],
       };
     } catch (error) {
       Logger.ERROR('Error during sequential crawling', error);
       throw new HttpException(
         HTTPStatus.INTERNAL_SERVER_ERROR,
-        'Error during crawling operation'
+        'Error during crawling operation',
+        error
       );
     }
+  }
+
+  private async cleanCrawler() {
+    if (this.urlCrawlerDataset) {
+      await this.urlCrawlerDataset.drop();
+    }
+    if (this.urlRequestQueue) {
+      await this.urlRequestQueue.drop();
+      Logger.INFO('Cleaned urlRequestQueue before start crawling');
+    }
+    Logger.INFO(
+      'Initializing urlCrawlerDataset & urlRequestQueue for content storage'
+    );
+    this.urlCrawlerDataset = await Dataset.open('url_crawler_dataset');
+    this.urlRequestQueue = await RequestQueue.open('url_request_queue');
+
+    if (this.contentCrawlerDataset) {
+      await this.contentCrawlerDataset.drop();
+    }
+    if (this.contentRequestQueue) {
+      await this.contentRequestQueue.drop();
+      Logger.INFO('Cleaned contentRequestQueue before start crawling');
+    }
+    Logger.INFO(
+      'Initializing contentCrawlerDataset & contentRequestQueue for content storage'
+    );
+    this.contentCrawlerDataset = await Dataset.open('content_crawler_dataset');
+    this.contentRequestQueue = await RequestQueue.open('content_request_queue');
   }
 }
