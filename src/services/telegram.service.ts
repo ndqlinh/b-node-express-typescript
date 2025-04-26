@@ -1,11 +1,9 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { Logger } from '@shared/helpers/logger.helper';
-import SsmHelper from '@shared/helpers/ssm.helper';
 import { Stream } from 'stream';
 
 export default class TelegramService {
   telegramBot: TelegramBot;
-  ssmHelper: SsmHelper;
   userStates = {};
   formSteps = {
     started: 'urls',
@@ -13,14 +11,14 @@ export default class TelegramService {
     contentSelector: 'contentSelector',
   };
 
-  constructor() {
-    this.ssmHelper = new SsmHelper();
-  }
+  constructor() {}
 
   async initialize() {
-    const telegramBotToken = await this.ssmHelper.getParams('TelegramBotToken');
-    this.telegramBot = new TelegramBot(telegramBotToken, { polling: true });
+    this.telegramBot = new TelegramBot(process.env.TELEGRAM_BOX_TOKEN);
+    // this.onListenMessage();
+  }
 
+  private onListenMessage() {
     this.telegramBot.onText(/\/start/, (msg) => {
       const chatId = msg.chat.id;
       this.userStates[chatId] = {

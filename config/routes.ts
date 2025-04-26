@@ -13,4 +13,6 @@ export const ROUTES = {
   task: '/api/task',
   resetPassword: '/api/reset-password',
   crawler: '/api/crawler',
+  telegram: '/api/telegram/{proxy+}',
+  telegramWebhook: '/api/telegram/webhook',
 };

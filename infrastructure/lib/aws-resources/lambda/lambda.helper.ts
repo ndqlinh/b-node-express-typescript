@@ -41,6 +41,9 @@ export class LambdaFunction implements LambdaFunctionProps {
   isApiProxy?: boolean;
   apiResourceMethod?: HttpMethods;
   apiKeyRequired?: boolean;
+  environment: {
+    [key: string]: string;
+  } = {};
 
   constructor(data: LambdaFunctionProps) {
     this.functionName = `NodeExpress${data.functionName}Function`;
@@ -57,9 +60,12 @@ export class LambdaFunction implements LambdaFunctionProps {
     this.isApiProxy = data.isApiProxy;
     this.apiResourceMethod = data.apiResourceMethod;
     this.apiKeyRequired = data.apiKeyRequired;
+    this.environment = data.environment || {};
   }
 
-  changeDynamodbTablesKey(dynamodbTables: { [tableName: string]: DynamodbPermission[] }) {
+  changeDynamodbTablesKey(dynamodbTables: {
+    [tableName: string]: DynamodbPermission[];
+  }) {
     if (!dynamodbTables) return undefined;
     const newDynamodbTables: { [tableName: string]: DynamodbPermission[] } = {};
     for (const [key, value] of Object.entries(dynamodbTables)) {

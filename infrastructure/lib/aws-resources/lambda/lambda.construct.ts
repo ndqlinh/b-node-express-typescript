@@ -31,7 +31,7 @@ export class LambdaConstruct extends Construct {
         runtime: func.runtime,
         timeout: Duration.seconds(func.timeout || 30),
         memorySize: func.memorySize,
-        environment: { ...defaultEnvironments },
+        environment: { ...defaultEnvironments, ...func.environment },
         bundling: {
           target: 'es2020',
           sourceMap: false,
