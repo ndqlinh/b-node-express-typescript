@@ -13,9 +13,20 @@ export default class TelegramService {
 
   constructor() {}
 
-  async initialize() {
+  initialize() {
     this.telegramBot = new TelegramBot(process.env.TELEGRAM_BOX_TOKEN);
     // this.onListenMessage();
+    return this.telegramBot;
+  }
+
+  setupCallbackQueryHandler(
+    callback: (query: TelegramBot.CallbackQuery) => void
+  ) {
+    if (!this.telegramBot) {
+      this.initialize();
+    }
+    this.telegramBot.on('callback_query', callback);
+    Logger.INFO('Callback query handler set up successfully');
   }
 
   private onListenMessage() {
@@ -92,12 +103,12 @@ export default class TelegramService {
     });
   }
 
-  async sendMessage(chatId: string, text: string) {
+  async sendMessage(chatId: string, text: string, options: any = {}) {
     try {
       if (!this.telegramBot) {
         await this.initialize();
       }
-      await this.telegramBot.sendMessage(chatId, text);
+      await this.telegramBot.sendMessage(chatId, text, options);
       Logger.INFO('Message sent successfully!', chatId);
     } catch (error) {
       Logger.ERROR('Error sending message:', error);
