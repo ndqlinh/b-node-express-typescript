@@ -14,8 +14,32 @@ const crawlTopics = {
     urls: ['https://alonhadat.com.vn/'],
     urlListSelector: '.new-property-box .items .item',
     contentSelector: 'div.contact-info div.content',
+    contentQueryHandler: (elements: (SVGElement | HTMLElement)[]) => {
+      return elements.map((element: SVGElement | HTMLElement) => ({
+        name: element.querySelector('.name')?.textContent?.trim() || '',
+        phone:element
+          .querySelector('.fone')
+          ?.querySelector('a')
+          ?.textContent?.trim()
+          .replaceAll('.', '') || ''
+      }))
+    },
   },
-  nhatot: null,
+  homedy: {
+    urls: ['https://homedy.com/ban-nha-dat/'],
+    urlListSelector: '.tab-content .product-item',
+    contentSelector: '.agency .info-agency',
+    contentQueryHandler: (elements: (SVGElement | HTMLElement)[]) => {
+      return elements.map((element: SVGElement | HTMLElement) => ({
+        name: element.querySelector('.name a').textContent?.trim() || '',
+        phone:element
+          .querySelector('.info a.mobile')
+          .getAttribute('data-mobile')
+          .trim()
+          ?.replaceAll('.', '') || ''
+      }))
+    },
+  },
 };
 
 /**
@@ -40,19 +64,10 @@ async function handleCallbackQuery(query: any) {
         `You selected ${data}. I will start crawl and send reponse to you after finished.`
       );
       // Initialize the crawler with the provided configuration
-      await crawler.initializeCrawler({
-        urlListSelector: crawlTopics[data].urlListSelector,
-        contentSelector: crawlTopics[data].contentSelector,
-        maxRequests: crawlTopics[data].maxRequests || 1,
-      });
+      await crawler.initializeCrawler(crawlTopics[data]);
       // Execute the two-level crawling
       await crawler.crawlDataSequentially(
         crawlTopics[data].urls,
-        {
-          urlListSelector: crawlTopics[data].urlListSelector,
-          contentSelector: crawlTopics[data].contentSelector,
-          maxRequests: crawlTopics[data].maxRequests || 1,
-        },
         chatId
       );
     } else {
@@ -86,10 +101,12 @@ export const handler = async (event: any) => {
       Logger.INFO(`Received message from ${from.username}: ${text}`);
       const options = {
         reply_markup: JSON.stringify({
-          inline_keyboard: [
-            [{ text: 'alonhadat', callback_data: 'alonhadat' }],
-            [{ text: 'nhatot', callback_data: 'nhatot' }],
-          ],
+          inline_keyboard: Object.keys(crawlTopics).map((topic) => [
+            {
+              text: topic,
+              callback_data: topic,
+            },
+          ]),
         }),
       };
       await telegram.sendMessage(

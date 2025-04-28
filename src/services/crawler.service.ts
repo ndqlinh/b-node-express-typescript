@@ -16,7 +16,7 @@ interface CrawlConfig {
   urlListSelector: string;
   contentSelector: string;
   maxRequests?: number;
-  transformUrls?: (url: string, baseUrl: string) => string;
+  contentQueryHandler?: (elements: (SVGElement | HTMLElement)[]) => any;
 }
 
 export default class CrawlerService {
@@ -122,20 +122,7 @@ export default class CrawlerService {
           // Extract content from the specified selector
           const content = await page.$$eval(
             config.contentSelector,
-            (elements) => {
-              return elements.map((element) => ({
-                name:
-                  element
-                    .getElementsByClassName('name')[0]
-                    .textContent?.trim() || '',
-                phone:
-                  element
-                    .getElementsByClassName('fone')[0]
-                    .getElementsByTagName('a')[0]
-                    .textContent?.trim()
-                    .replaceAll('.', '') || '',
-              }));
-            }
+            config.contentQueryHandler
           );
 
           await self.contentCrawlerDataset.pushData({
@@ -162,7 +149,6 @@ export default class CrawlerService {
 
   async crawlDataSequentially(
     urls: string[],
-    config: CrawlConfig,
     chatId?: string | number
   ) {
     Logger.INFO('Chat ID:', chatId);
@@ -195,9 +181,7 @@ export default class CrawlerService {
 
             // Handle relative URLs
             if (dataItem.href) {
-              if (config.transformUrls) {
-                fullUrl = config.transformUrls(dataItem.href, baseUrl);
-              } else if (dataItem.href.startsWith('http')) {
+              if (dataItem.href.startsWith('http')) {
                 fullUrl = dataItem.href;
               } else if (dataItem.href.startsWith('/')) {
                 fullUrl = `${baseUrl}${dataItem.href}`;
@@ -232,38 +216,8 @@ export default class CrawlerService {
         offset: 0,
         limit: 1000,
       });
-      const postsContent = contentItems.map((item) => {
-        return {
-          ...item.content[0],
-          crawledUrl: item.url,
-        };
-      });
-      Logger.INFO('Crawled posts content:', postsContent);
-
-      // Convert JSON to a formatted string message
-      let formattedMessage = 'Crawled Data:\n\n';
-
-      if (postsContent && postsContent.length > 0) {
-        formattedMessage += postsContent
-          .map((item) => {
-            // Create a line for each entry in format: Name: Phone
-            return `${item.name || 'Unknown'}: ${item.phone || 'No phone'}`;
-          })
-          .join('\n');
-      } else {
-        formattedMessage += 'No data found.';
-      }
-
-      // Add crawl information
-      formattedMessage += `\n\nTotal entries: ${
-        postsContent.length
-      }\nCrawled on: ${new Date().toLocaleString()}`;
-
-      // Send the formatted message to Telegram
-      await this.telegram.sendMessage(
-        String(chatId || '1003418810'),
-        formattedMessage
-      );
+      
+      await this.reportCrawledData(contentItems, chatId);
 
       return {
         urlData,
@@ -305,5 +259,43 @@ export default class CrawlerService {
     );
     this.contentCrawlerDataset = await Dataset.open('content_crawler_dataset');
     this.contentRequestQueue = await RequestQueue.open('content_request_queue');
+  }
+
+  async reportCrawledData(data: any, chatId?: string | number) {
+    // Implement your logic to report crawled data
+    Logger.INFO('Crawled data:', data);
+
+    const postsContent = data.map((item) => {
+      return {
+        ...item.content[0],
+        crawledUrl: item.url,
+      };
+    });
+    Logger.INFO('Crawled posts content:', postsContent);
+
+    // Convert JSON to a formatted string message
+    let formattedMessage = 'Crawled Data:\n\n';
+
+    if (postsContent && postsContent.length > 0) {
+      formattedMessage += postsContent
+        .map((item) => {
+          // Create a line for each entry in format: Name: Phone
+          return `${item.name || 'Unknown'}: ${item.phone || 'No phone'}`;
+        })
+        .join('\n');
+    } else {
+      formattedMessage += 'No data found.';
+    }
+
+    // Add crawl information
+    formattedMessage += `\n\nTotal entries: ${
+      postsContent.length
+    }\nCrawled on: ${new Date().toLocaleString()}`;
+
+    // Send the formatted message to Telegram
+    await this.telegram.sendMessage(
+      String(chatId || '1003418810'),
+      formattedMessage
+    );
   }
 }
