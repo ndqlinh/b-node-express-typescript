@@ -290,7 +290,7 @@ export default class CrawlerService {
     // Add crawl information
     formattedMessage += `\n\nTotal entries: ${
       postsContent.length
-    }\nCrawled on: ${new Date().toLocaleString()}`;
+    }\nCrawled on: ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' })}`;
 
     // Send the formatted message to Telegram
     await this.telegram.sendMessage(

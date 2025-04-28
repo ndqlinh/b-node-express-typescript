@@ -17,12 +17,13 @@ const crawlTopics = {
     contentQueryHandler: (elements: (SVGElement | HTMLElement)[]) => {
       return elements.map((element: SVGElement | HTMLElement) => ({
         name: element.querySelector('.name')?.textContent?.trim() || '',
-        phone:element
-          .querySelector('.fone')
-          ?.querySelector('a')
-          ?.textContent?.trim()
-          .replaceAll('.', '') || ''
-      }))
+        phone:
+          element
+            .querySelector('.fone')
+            ?.querySelector('a')
+            ?.textContent?.trim()
+            .replaceAll('.', '') || '',
+      }));
     },
   },
   homedy: {
@@ -32,12 +33,36 @@ const crawlTopics = {
     contentQueryHandler: (elements: (SVGElement | HTMLElement)[]) => {
       return elements.map((element: SVGElement | HTMLElement) => ({
         name: element.querySelector('.name a').textContent?.trim() || '',
-        phone:element
-          .querySelector('.info a.mobile')
-          .getAttribute('data-mobile')
-          .trim()
-          ?.replaceAll('.', '') || ''
-      }))
+        phone:
+          element
+            .querySelector('.info a.mobile')
+            .getAttribute('data-mobile')
+            .trim()
+            ?.replaceAll('.', '') || '',
+      }));
+    },
+  },
+  dothinet: {
+    urls: ['https://dothi.net/'],
+    urlListSelector: '.content-left .vip-5-highlight',
+    contentSelector: '.pd-info .pd-contact',
+    contentQueryHandler: (elements: (SVGElement | HTMLElement)[]) => {
+      return elements.map((element: SVGElement | HTMLElement) => ({
+        name:
+          element
+            .querySelector('tr:first-child')
+            ?.querySelector('td:nth-child(2)')
+            ?.textContent?.trim() || '',
+        phone:
+          Object.values(
+            element
+              .querySelector('tr:nth-child(2)')
+              ?.querySelector('td:nth-child(2)')?.textContent
+          )
+            ?.toString()
+            ?.trim()
+            .replaceAll(',', '') || '',
+      }));
     },
   },
 };
@@ -66,10 +91,7 @@ async function handleCallbackQuery(query: any) {
       // Initialize the crawler with the provided configuration
       await crawler.initializeCrawler(crawlTopics[data]);
       // Execute the two-level crawling
-      await crawler.crawlDataSequentially(
-        crawlTopics[data].urls,
-        chatId
-      );
+      await crawler.crawlDataSequentially(crawlTopics[data].urls, chatId);
     } else {
       await telegram.sendMessage(
         chatId,
@@ -99,6 +121,16 @@ export const handler = async (event: any) => {
       const { chat, text, from } = body.message;
       Logger.INFO('Chat ID:', chat.id);
       Logger.INFO(`Received message from ${from.username}: ${text}`);
+      const chunkedTopics = Object.keys(crawlTopics).reduce((acc, topic) => {
+        const chunkIndex = Math.floor(acc.length / 2);
+        if (!acc[chunkIndex]) {
+          acc[chunkIndex] = [];
+        }
+        acc[chunkIndex].push(topic);
+        return acc;
+      }, []);
+      Logger.INFO('Chunked Topics:', chunkedTopics);
+
       const options = {
         reply_markup: JSON.stringify({
           inline_keyboard: Object.keys(crawlTopics).map((topic) => [
