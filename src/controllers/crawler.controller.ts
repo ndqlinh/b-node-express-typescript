@@ -61,11 +61,6 @@ export const crawlMultipleUrls = async (
     // Execute the two-level crawling
     await crawler.crawlDataSequentially(
       requestBody.urls,
-      {
-        urlListSelector: requestBody.urlListSelector,
-        contentSelector: requestBody.contentSelector,
-        maxRequests: requestBody.maxRequests || 1,
-      },
       requestBody.chatId
     );
 
